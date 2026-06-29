@@ -312,15 +312,15 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       if (classicWrap) {
         if (window.AppMode === 'world') {
           if (classicCard) classicCard.style.display = 'block';
-          const completedClassics = userData.completedClassics || [];
-          const totalSongs = (window.CLASSIC_DATA || []).length || 100;
-          const pct = Math.round((completedClassics.length / totalSongs) * 100);
+          const completedClassicGroups = userData.completedClassicGroups || [];
+          const totalGroups = 60;
+          const pct = Math.round((completedClassicGroups.length / totalGroups) * 100);
           const barColor = pct >= 100 ? 'var(--secondary)' : pct >= 50 ? 'var(--primary)' : 'var(--accent)';
           classicWrap.innerHTML = `
             <div class="progress-bar-wrap">
               <div class="pb-label-row">
-                <span class="pb-name">🎵 전체 클래식 100곡</span>
-                <span class="pb-stat">${completedClassics.length}/${totalSongs} 곡 (${pct}%)</span>
+                <span class="pb-name">🎵 클래식 학습 진도</span>
+                <span class="pb-stat">${completedClassicGroups.length}/${totalGroups} 그룹 (${pct}%)</span>
               </div>
               <div class="pb-track">
                 <div class="pb-fill" style="width:${pct}%;background:${barColor};"></div>

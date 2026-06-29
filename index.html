@@ -1291,12 +1291,7 @@
           <div class="fc-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
             <div>
               <h1 class="text-gradient">🎵 클래식 음악 학습기</h1>
-              <p style="color:var(--text-muted); margin-top:0.4rem;">교과서 필수 세계 명곡 100선! 음악을 감상하고 재미있는 퀴즈로 포인트를 획득하세요.</p>
-            </div>
-            <div>
-              <button class="btn btn-primary" id="cl-btn-start-quiz" style="padding:0.6rem 1.5rem; font-size:0.95rem; font-weight:700; background:linear-gradient(135deg, var(--secondary), var(--accent)); border:none; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-                🏆 클래식 퀴즈 도전 (+10 P)
-              </button>
+              <p style="color:var(--text-muted); margin-top:0.4rem;">교과서 필수 세계 명곡 180선! 3곡씩 묶인 그룹을 골라 플래시 감상 후 확인 퀴즈를 풀어보세요.</p>
             </div>
           </div>
           <div class="fc-continent-grid" id="cl-stage-grid">
@@ -1307,10 +1302,10 @@
         <!-- ── 감상 학습 화면 ─────────────────────────────────── -->
         <div id="cl-study-area" class="hidden">
           <div class="fc-learn-header">
-            <button class="btn btn-outline fc-back-btn" id="cl-btn-study-back">← 스테이지 목록</button>
+            <button class="btn btn-outline fc-back-btn" id="cl-btn-study-back">← 그룹 목록</button>
             <div class="fc-learn-meta">
-              <span id="cl-study-stage-title" style="font-size:0.85rem; color:var(--text-muted);">바로크 시대 명곡</span>
-              <span id="cl-study-progress-text" style="font-weight:700; color:var(--primary);">1 / 10</span>
+              <span id="cl-study-stage-title" style="font-size:0.85rem; color:var(--text-muted);">클래식 학습 그룹 1</span>
+              <span id="cl-study-progress-text" style="font-weight:700; color:var(--primary);">1 / 3</span>
             </div>
           </div>
 
@@ -1343,8 +1338,7 @@
 
             <div style="display:flex; justify-content:space-between; width:100%; margin-top:1rem; align-items:center; flex-wrap:wrap; gap:1rem;">
               <button class="btn btn-outline" id="cl-btn-prev-song" style="padding:0.5rem 1rem;">← 이전 곡</button>
-              <button class="btn btn-primary" id="cl-btn-complete-song" style="padding:0.5rem 1.5rem; font-weight:700;">🌟 들었다고 표시하기 (+5 P)</button>
-              <button class="btn btn-outline" id="cl-btn-next-song" style="padding:0.5rem 1rem;">다음 곡 →</button>
+              <button class="btn btn-outline" id="cl-btn-next-song" style="padding:0.5rem 1.5rem; font-weight:700;">다음 곡 →</button>
             </div>
           </div>
         </div>
@@ -1352,9 +1346,9 @@
         <!-- ── 퀴즈 평가 화면 ─────────────────────────────────── -->
         <div id="cl-quiz-area" class="hidden">
           <div class="fc-learn-header">
-            <button class="btn btn-outline fc-back-btn" id="cl-btn-quiz-back">← 학습 목록</button>
+            <button class="btn btn-outline fc-back-btn" id="cl-btn-quiz-back">← 학습 종료</button>
             <div class="fc-learn-meta">
-              <span id="cl-quiz-progress-text" style="font-size:0.85rem; color:var(--text-muted);">문제 1 / 10</span>
+              <span id="cl-quiz-progress-text" style="font-size:0.85rem; color:var(--text-muted);">문제 1 / 3</span>
               <span id="cl-quiz-score-text" style="font-weight:700; color:var(--secondary);">맞힌 개수: 0개</span>
             </div>
           </div>
@@ -1365,6 +1359,11 @@
               <div>
                 <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.3rem;">어떤 곡일까요?</h3>
                 <p style="color:var(--text-muted); font-size:0.88rem;">30초 미리듣기 음악을 재생하고 작곡가와 곡명을 선택하세요.</p>
+              </div>
+
+              <!-- 오디오 제어 -->
+              <div style="width: 100%; max-width: 400px; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <button class="btn btn-primary" id="cl-btn-play-quiz" style="padding:0.6rem 1.5rem; font-size:0.9rem; font-weight:700; width:100%;">▶️ 음악 듣기 (30초)</button>
               </div>
             </div>
 
@@ -1392,7 +1391,7 @@
             <div style="display: flex; gap: 2rem; margin: 1rem 0;">
               <div>
                 <div style="font-size: 0.85rem; color: var(--text-muted);">최종 점수</div>
-                <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="cl-result-score">0 / 10</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="cl-result-score">0 / 3</div>
               </div>
               <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
               <div>

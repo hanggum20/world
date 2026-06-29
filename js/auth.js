@@ -442,7 +442,7 @@
                 visitedCountries: [],
                 visitedSigungus: [],
                 worksheetHistory: [],
-                completedClassics: [],
+                completedClassicGroups: [],
                 badges: ['welcome'],
                 role: 'student'
               };
@@ -465,7 +465,7 @@
               visitedCountries: found.visitedCountries || [],
               visitedSigungus: found.visitedSigungus || [],
               worksheetHistory: found.worksheetHistory || [],
-              completedClassics: found.completedClassics || [],
+              completedClassicGroups: found.completedClassicGroups || [],
               role: found.role || 'student',
               school: found.school || '',
               grade: found.grade || null,
@@ -485,7 +485,7 @@
               visitedCountries: [],
               visitedSigungus: [],
               worksheetHistory: [],
-              completedClassics: [],
+              completedClassicGroups: [],
               role: 'student'
             });
           }
