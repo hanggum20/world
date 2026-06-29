@@ -638,6 +638,41 @@
     if (!defaultState || !activeState) return;
 
     if (data) {
+      // Firebase에 탐색한 국가/도시 정보 저장 (중복 기록 없이 5P 획득)
+      const user = window.AppAuth.getCurrentUser();
+      if (user) {
+        window.AppAuth.getUserData().then(userData => {
+          if (!userData) return;
+          if (window.AppMode === 'world') {
+            const visited = userData.visitedCountries || [];
+            if (!visited.includes(code)) {
+              visited.push(code);
+              const newPoints = (userData.points || 0) + 5;
+              window.AppAuth.updateUserData({
+                visitedCountries: visited,
+                points: newPoints
+              }).then(() => {
+                const pointsEl = document.getElementById('user-points');
+                if (pointsEl) pointsEl.textContent = `${newPoints} P`;
+              });
+            }
+          } else {
+            const visited = userData.visitedSigungus || [];
+            if (!visited.includes(code)) {
+              visited.push(code);
+              const newPoints = (userData.points || 0) + 5;
+              window.AppAuth.updateUserData({
+                visitedSigungus: visited,
+                points: newPoints
+              }).then(() => {
+                const pointsEl = document.getElementById('user-points');
+                if (pointsEl) pointsEl.textContent = `${newPoints} P`;
+              });
+            }
+          }
+        });
+      }
+
       // 34개 학습 주요 국가인 경우
       defaultState.classList.add('hidden');
       activeState.classList.remove('hidden');

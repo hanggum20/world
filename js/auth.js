@@ -433,7 +433,18 @@
             if (doc.exists) {
               return doc.data();
             } else {
-              const initialData = { points: 0, completedQuizzes: [], badges: ['welcome'], role: 'student' };
+              const initialData = {
+                points: 0,
+                completedQuizzes: [],
+                completedFlashcards: [],
+                flashcardStats: {},
+                quizHistory: [],
+                visitedCountries: [],
+                visitedSigungus: [],
+                worksheetHistory: [],
+                badges: ['welcome'],
+                role: 'student'
+              };
               return dbInstance.collection('users').doc(currentUser.uid).set(initialData)
                 .then(() => initialData);
             }
@@ -450,6 +461,9 @@
               badges: found.badges || ['welcome'],
               flashcardStats: found.flashcardStats || {},
               quizHistory: found.quizHistory || [],
+              visitedCountries: found.visitedCountries || [],
+              visitedSigungus: found.visitedSigungus || [],
+              worksheetHistory: found.worksheetHistory || [],
               role: found.role || 'student',
               school: found.school || '',
               grade: found.grade || null,
@@ -459,7 +473,18 @@
               displayName: found.displayName || ''
             });
           } else {
-            resolve({ points: 0, completedQuizzes: [], completedFlashcards: [], badges: ['welcome'], flashcardStats: {}, quizHistory: [], role: 'student' });
+            resolve({
+              points: 0,
+              completedQuizzes: [],
+              completedFlashcards: [],
+              badges: ['welcome'],
+              flashcardStats: {},
+              quizHistory: [],
+              visitedCountries: [],
+              visitedSigungus: [],
+              worksheetHistory: [],
+              role: 'student'
+            });
           }
         });
       }

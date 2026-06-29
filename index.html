@@ -544,6 +544,14 @@
             <button class="btn btn-primary" id="btn-generate-ws" style="width: 100%;">⚙️ 학습지 생성/새로고침</button>
             <button class="btn btn-secondary" id="btn-print-ws" style="width: 100%;">🖨️ 학습지 인쇄 / PDF 저장</button>
           </div>
+
+          <!-- 최근 학습지 생성 기록 -->
+          <div id="ws-history-section" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem; display: none;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">📋 최근 생성 학습지</h3>
+            <ul id="ws-history-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; max-height: 150px; overflow-y: auto; font-size: 0.8rem;">
+              <!-- 생성 이력 목록 -->
+            </ul>
+          </div>
         </div>
 
         <!-- Right Worksheet Live Preview Area -->
@@ -1093,7 +1101,7 @@
           </div>
           <div class="sdp-body">
             <!-- 요약 -->
-            <div class="progress-summary-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="progress-summary-grid" style="grid-template-columns:repeat(4,1fr); gap:0.75rem;">
               <div class="progress-stat-card glass-panel">
                 <div class="ps-icon">⭐</div>
                 <div class="ps-value" id="sdp-points">0</div>
@@ -1103,6 +1111,11 @@
                 <div class="ps-icon">🏆</div>
                 <div class="ps-value" id="sdp-quiz-count">0</div>
                 <div class="ps-label">퀴즈 횟수</div>
+              </div>
+              <div class="progress-stat-card glass-panel">
+                <div class="ps-icon">🗺️</div>
+                <div class="ps-value" id="sdp-map-count">0</div>
+                <div class="ps-label">지도 탐색</div>
               </div>
               <div class="progress-stat-card glass-panel">
                 <div class="ps-icon">🎖️</div>
@@ -1159,8 +1172,8 @@
         <p style="color:var(--text-muted);">지금까지 쌓아온 나의 모든 학습 기록을 한눈에 확인하세요.</p>
       </div>
 
-      <!-- 요약 카드 4개 -->
-      <div class="progress-summary-grid" id="pg-summary-grid">
+      <!-- 요약 카드 5개 -->
+      <div class="progress-summary-grid" id="pg-summary-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
         <div class="progress-stat-card glass-panel">
           <div class="ps-icon">⭐</div>
           <div class="ps-value" id="pg-total-points">0</div>
@@ -1175,6 +1188,11 @@
           <div class="ps-icon">⚡</div>
           <div class="ps-value" id="pg-fc-count">0</div>
           <div class="ps-label">완료 플래시 그룹</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">🗺️</div>
+          <div class="ps-value" id="pg-map-count">0</div>
+          <div class="ps-label">지도 탐색 지역</div>
         </div>
         <div class="progress-stat-card glass-panel">
           <div class="ps-icon">🎖️</div>

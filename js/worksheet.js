@@ -151,6 +151,32 @@
 
       previewContainer.appendChild(answerPage);
     }
+
+    // Firebase에 학습지 생성 이력 저장
+    const user = window.AppAuth.getCurrentUser();
+    if (user && (user.role === 'teacher' || user.role === 'admin')) {
+      window.AppAuth.getUserData().then(userData => {
+        if (!userData) return;
+        const history = userData.worksheetHistory || [];
+        const newEntry = {
+          date: new Date().toISOString(),
+          title: title,
+          type: type,
+          count: count,
+          mode: window.AppMode || 'world',
+          continents: selectedContinents
+        };
+        const dupIdx = history.findIndex(h => h.title === title && h.type === type && h.count === count);
+        if (dupIdx !== -1) {
+          history.splice(dupIdx, 1);
+        }
+        history.unshift(newEntry);
+        if (history.length > 20) history.splice(20);
+        window.AppAuth.updateUserData({ worksheetHistory: history }).then(() => {
+          renderWorksheetHistory();
+        });
+      });
+    }
   }
 
   // 2. 문제 세부 문항 데이터 구축
@@ -450,7 +476,53 @@
         <label><input type="checkbox" value="제주도"> 제주</label>
       `;
     }
+
+    // 최근 학습지 생성 이력 렌더링
+    renderWorksheetHistory();
   }
+
+  function renderWorksheetHistory() {
+    const user = window.AppAuth.getCurrentUser();
+    const section = document.getElementById('ws-history-section');
+    const list = document.getElementById('ws-history-list');
+    if (!section || !list) return;
+
+    if (!user || (user.role !== 'teacher' && user.role !== 'admin')) {
+      section.style.display = 'none';
+      return;
+    }
+
+    window.AppAuth.getUserData().then(userData => {
+      if (!userData) {
+        section.style.display = 'none';
+        return;
+      }
+
+      const history = userData.worksheetHistory || [];
+      if (history.length === 0) {
+        section.style.display = 'block';
+        list.innerHTML = '<li style="color:var(--text-muted);text-align:center;padding:0.5rem 0;">생성 이력이 없습니다.</li>';
+        return;
+      }
+
+      section.style.display = 'block';
+      list.innerHTML = history.map(item => {
+        const d = new Date(item.date);
+        const dateStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        const typeLabel = { mixed: '혼합형', 'multiple-choice': '객관식', 'write-capital': '주관식', matching: '선긋기' }[item.type] || item.type;
+        return `
+          <li style="background:rgba(255,255,255,0.03); padding:0.4rem 0.6rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; border:1px solid rgba(255,255,255,0.05); margin-bottom: 0.35rem;">
+            <div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; flex:1;" title="${item.title}">
+              📄 <strong>${item.title}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">(${typeLabel}, ${item.count}문항)</span>
+            </div>
+            <span style="font-size:0.7rem; color:var(--text-muted); flex-shrink:0;">${dateStr}</span>
+          </li>
+        `;
+      }).join('');
+    });
+  }
+
+  window._renderWorksheetHistory = renderWorksheetHistory;
 
   // 9. 네임스페이스 등록
   window.AppWorksheet = {

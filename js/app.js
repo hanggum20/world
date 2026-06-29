@@ -195,6 +195,7 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       const quizHistory  = userData.quizHistory || [];
       const fcCompleted  = userData.completedFlashcards || [];
       const fcStats      = userData.flashcardStats || {};
+      const visitedCount = ((window.AppMode === 'world' ? userData.visitedCountries : userData.visitedSigungus) || []).length;
 
       // ① 요약 카드
       const el = id => document.getElementById(id);
@@ -202,6 +203,7 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       if (el('pg-quiz-count'))   el('pg-quiz-count').textContent   = quizHistory.length;
       if (el('pg-fc-count'))     el('pg-fc-count').textContent     = fcCompleted.length;
       if (el('pg-badge-count'))  el('pg-badge-count').textContent  = badges.length;
+      if (el('pg-map-count'))    el('pg-map-count').textContent    = visitedCount + (window.AppMode === 'world' ? '개국' : '개 지역');
 
       // ② 배지
       const badgeMap = {
@@ -884,6 +886,12 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
         document.getElementById('sdp-points').textContent = (s.points || 0).toLocaleString();
         document.getElementById('sdp-quiz-count').textContent = (s.quizHistory || []).length;
         document.getElementById('sdp-badge-count').textContent = (s.badges || []).length;
+        
+        const mapExplored = ((window.AppMode === 'world' ? s.visitedCountries : s.visitedSigungus) || []).length;
+        const sdpMapCount = document.getElementById('sdp-map-count');
+        if (sdpMapCount) {
+          sdpMapCount.textContent = mapExplored + (window.AppMode === 'world' ? '개국' : '개 지역');
+        }
 
         const histEl = document.getElementById('sdp-quiz-history');
         const qh = (s.quizHistory || []).slice(0, 10);
