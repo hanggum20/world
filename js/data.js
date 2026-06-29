@@ -656,7 +656,7 @@ window.WORLD_DATA = [
     landmarks: ["아르빌 시타델 요새성채", "사미 압둘라만 공원"]
   },
   {
-    code: "sb-ru",
+    code: "ru",
     name: "시베리아",
     engName: "Siberia",
     capital: "노보시비르스크",
@@ -1190,7 +1190,7 @@ window.WORLD_DATA = [
     landmarks: ["물라포수르 절벽폭포", "팅가네스 목조지구"]
   },
   {
-    code: "ax-eu",
+    code: "ax",
     name: "올란드 제도",
     engName: "Aland Islands",
     capital: "마리에함",
@@ -1598,7 +1598,7 @@ window.WORLD_DATA = [
     landmarks: ["스탠리 지포 해변 펭귄 서식지", "크라이스트처치 대성당"]
   },
   {
-    code: "gf-sa",
+    code: "gf",
     name: "프랑스령 기아나",
     engName: "French Guiana",
     capital: "카옌",
@@ -1609,7 +1609,7 @@ window.WORLD_DATA = [
     landmarks: ["쿠루 유럽 우주센터 발사장", "악마의 섬 구수용소"]
   },
   {
-    code: "gs-sa",
+    code: "gs",
     name: "사우스조지아 제도",
     engName: "South Georgia Islands",
     capital: "그리트비켄",
