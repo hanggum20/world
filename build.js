@@ -67,3 +67,39 @@ const targetPath = path.join(__dirname, 'js', 'firebase-config.js');
 fs.writeFileSync(targetPath, fileContent, 'utf8');
 console.log('Firebase 설정 컴파일 완료:', targetPath);
 
+// Vercel 배포를 위해 public 폴더 구성 (Vercel 기본 출력 디렉토리인 public에 맞춤)
+try {
+  const publicDir = path.join(__dirname, 'public');
+  
+  // 기존 public 폴더가 있다면 삭제 후 재생성 (클린 빌드)
+  if (fs.existsSync(publicDir)) {
+    fs.rmSync(publicDir, { recursive: true, force: true });
+  }
+  fs.mkdirSync(publicDir, { recursive: true });
+
+  // HTML 및 SVG 파일 복사
+  fs.copyFileSync(path.join(__dirname, 'index.html'), path.join(publicDir, 'index.html'));
+  if (fs.existsSync(path.join(__dirname, 'world-map.min.svg'))) {
+    fs.copyFileSync(path.join(__dirname, 'world-map.min.svg'), path.join(publicDir, 'world-map.min.svg'));
+  }
+
+  // 주요 에셋 폴더 복사 (css, images, js)
+  const dirsToCopy = ['css', 'images', 'js'];
+  dirsToCopy.forEach(dir => {
+    const srcDir = path.join(__dirname, dir);
+    const destDir = path.join(publicDir, dir);
+    if (fs.existsSync(srcDir)) {
+      fs.cpSync(srcDir, destDir, { recursive: true });
+    }
+  });
+
+  // public/js/firebase-config.js 에도 동일하게 환경 변수 설정 반영
+  const publicConfigPath = path.join(publicDir, 'js', 'firebase-config.js');
+  fs.writeFileSync(publicConfigPath, fileContent, 'utf8');
+
+  console.log('Vercel 배포용 public 폴더 빌드 완료');
+} catch (e) {
+  console.error('public 폴더 빌드 중 에러 발생:', e);
+}
+
+

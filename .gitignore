@@ -20,4 +20,8 @@ Thumbs.db
 # Scratch directory
 scratch/
 
+# Vercel build output
+public/
+
+
 
