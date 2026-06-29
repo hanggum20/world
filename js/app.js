@@ -419,20 +419,14 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
     // 로고 클릭 시 모드 선택 화면으로 이동 (모드 변경 기능 겸용)
     document.getElementById('go-home-logo').addEventListener('click', () => {
       const user = window.AppAuth.getCurrentUser();
-      if (user) {
-        if (user.role === 'admin') {
-          switchView('admin-view');
-        } else {
-          switchView('mode-select-view');
-        }
-      }
+      if (user) switchView('mode-select-view');
     });
 
     // 최고관리자 -> 선생님/학생 대시보드 화면 전환 버튼
     const btnAdminGoTeacher = document.getElementById('btn-admin-go-teacher');
     if (btnAdminGoTeacher) {
       btnAdminGoTeacher.addEventListener('click', () => {
-        switchView('dashboard-view');
+        switchView('mode-select-view');
       });
     }
 
