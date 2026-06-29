@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 예산군 CI: 파란 물결/수덕사 형태 -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 산 실루엣 -->
+  <path d="M15,60 Q30,35 50,28 Q70,35 85,60 Z" fill="#0066cc" opacity="0.15"/>
+  <path d="M15,60 Q30,38 50,30 Q70,38 85,60" fill="none" stroke="#0066cc" stroke-width="6" stroke-linecap="round"/>
+  <!-- 물결 1 -->
+  <path d="M15,68 Q27,61 38,68 Q50,75 62,68 Q73,61 85,68" fill="none" stroke="#0088dd" stroke-width="5" stroke-linecap="round"/>
+  <!-- 물결 2 -->
+  <path d="M18,78 Q30,71 41,78 Q53,85 65,78 Q76,71 82,78" fill="none" stroke="#00aaee" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <!-- 중앙 태양/꽃 -->
+  <circle cx="50" cy="45" r="8" fill="#ffaa00"/>
+</svg>

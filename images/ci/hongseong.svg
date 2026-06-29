@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 홍성군 CI: 파란+빨강 성문/홍주읍성 형태 -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 성벽 기단 -->
+  <rect x="12" y="65" width="76" height="18" rx="3" fill="#1155aa"/>
+  <!-- 성문 탑 중앙 -->
+  <rect x="30" y="35" width="40" height="32" rx="2" fill="#0044aa"/>
+  <!-- 성문 아치 -->
+  <path d="M38,67 L38,52 Q38,42 50,42 Q62,42 62,52 L62,67 Z" fill="#002288"/>
+  <!-- 지붕 -->
+  <path d="M25,35 L50,15 L75,35 Z" fill="#cc2200"/>
+  <path d="M28,37 L50,20 L72,37 Z" fill="#ee3311"/>
+  <!-- 지붕 처마 -->
+  <path d="M22,37 L78,37" fill="none" stroke="#aa1100" stroke-width="4" stroke-linecap="round"/>
+  <!-- 창문 -->
+  <rect x="42" y="48" width="16" height="10" rx="1" fill="#ffffff" opacity="0.4"/>
+</svg>

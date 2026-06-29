@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 당진시 CI: 붉은+주황 태양/해돋이 형태 (왜목마을 일출) -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 태양 광선 -->
+  <line x1="50" y1="10" x2="50" y2="22" stroke="#ff6600" stroke-width="5" stroke-linecap="round"/>
+  <line x1="83" y1="17" x2="74" y2="26" stroke="#ff6600" stroke-width="4" stroke-linecap="round"/>
+  <line x1="90" y1="50" x2="78" y2="50" stroke="#ff6600" stroke-width="4" stroke-linecap="round"/>
+  <line x1="83" y1="83" x2="74" y2="74" stroke="#ff8800" stroke-width="4" stroke-linecap="round"/>
+  <line x1="17" y1="17" x2="26" y2="26" stroke="#ff6600" stroke-width="4" stroke-linecap="round"/>
+  <line x1="10" y1="50" x2="22" y2="50" stroke="#ff6600" stroke-width="4" stroke-linecap="round"/>
+  <!-- 반쪽 태양 (수평선) -->
+  <path d="M20,58 Q30,44 50,44 Q70,44 80,58" fill="#ff6600" opacity="0.2"/>
+  <!-- 태양 원 -->
+  <circle cx="50" cy="50" r="22" fill="#ff6600"/>
+  <circle cx="50" cy="50" r="14" fill="#ffaa00"/>
+  <!-- 수평선 물결 -->
+  <path d="M15,68 Q27,61 38,68 Q50,75 62,68 Q73,61 85,68" fill="none" stroke="#0066aa" stroke-width="4" stroke-linecap="round"/>
+</svg>

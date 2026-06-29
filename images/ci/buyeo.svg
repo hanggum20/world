@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 부여군 CI: 황금 원형 연꽃 문양 (백제) -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 외부 원 -->
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#b8860b" stroke-width="5"/>
+  <!-- 연꽃 꽃잎 8장 -->
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(0,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(45,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(90,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(135,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(180,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(225,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(270,50,50)"/>
+  <ellipse cx="50" cy="22" rx="7" ry="12" fill="#daa520" transform="rotate(315,50,50)"/>
+  <!-- 중앙 원 -->
+  <circle cx="50" cy="50" r="14" fill="#b8860b"/>
+  <circle cx="50" cy="50" r="9" fill="#ffd700"/>
+</svg>

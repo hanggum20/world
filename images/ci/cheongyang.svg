@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 청양군 CI: 빨간 고추 형태 -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 고추 꼭지/줄기 -->
+  <path d="M50,18 Q58,15 62,10" fill="none" stroke="#2a8a00" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50,18 Q44,12 48,8" fill="none" stroke="#2a8a00" stroke-width="3" stroke-linecap="round"/>
+  <!-- 고추 잎 -->
+  <path d="M50,18 Q60,20 65,15 Q63,25 54,24" fill="#2a8a00"/>
+  <!-- 고추 몸통 -->
+  <path d="M50,18 Q62,22 65,40 Q68,58 58,75 Q50,85 50,85 Q50,85 42,75 Q32,58 35,40 Q38,22 50,18 Z" fill="#cc1100"/>
+  <!-- 고추 광택 -->
+  <path d="M50,22 Q58,24 60,38 Q62,52 58,64" fill="none" stroke="#ff4422" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+</svg>

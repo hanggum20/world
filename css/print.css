@@ -1,0 +1,93 @@
+/* 인쇄용 학습지 스타일 시트 (A4 세로 인쇄 최적화) */
+
+@media print {
+  /* 1. 웹 화면 요소 숨기기 */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. 학습지 인쇄 영역 및 부모 요소만 표시 */
+  #worksheet-preview,
+  #worksheet-preview *,
+  .a4-page,
+  .a4-page * {
+    visibility: visible;
+  }
+
+  /* 3. 인쇄 시 여백 및 크기 초기화 */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* 4. 절대 배치 해제 및 인쇄 위치 조절 */
+  #worksheet-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* 5. A4 페이지 단위 스타일 */
+  .a4-page {
+    width: 210mm;
+    height: 297mm;
+    min-height: 297mm;
+    padding: 20mm 15mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+  }
+
+  /* 6. 페이지 나누기 자동 제어 */
+  .ws-question {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .ws-match-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 7. 잉크 절약을 위해 배경색 해제 및 텍스트 흑백화 */
+  .ws-instructions {
+    background: #f1f5f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-left: 4px solid #475569 !important;
+  }
+
+  .ws-field-item {
+    border-bottom: 1px solid #000000 !important;
+  }
+
+  .ws-short-answer-line {
+    border-bottom: 1px dotted #000000 !important;
+  }
+
+  /* 8. 브라우저 헤더/푸터 기본 인쇄 제거용 마진 설정 */
+  @page {
+    size: A4 portrait;
+    margin: 0mm; /* 브라우저 기본 헤더/푸터를 숨기기 위해 여백을 0으로 설정 */
+  }
+}

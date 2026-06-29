@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 천안시 CI: 파랑+초록+빨강 삼색 원형 C 형태 -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <path d="M50,8 A42,42 0 0,1 92,50 L80,50 A30,30 0 0,0 50,20 Z" fill="#0066cc"/>
+  <path d="M92,50 A42,42 0 0,1 50,92 L50,80 A30,30 0 0,0 80,50 Z" fill="#33aa33"/>
+  <path d="M50,92 A42,42 0 0,1 8,50 L20,50 A30,30 0 0,0 50,80 Z" fill="#cc2222"/>
+  <path d="M8,50 A42,42 0 0,1 50,8 L50,20 A30,30 0 0,0 20,50 Z" fill="#ffaa00"/>
+  <circle cx="50" cy="50" r="20" fill="white"/>
+</svg>

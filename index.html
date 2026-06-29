@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>초등 6학년 세계 지리 학습 & 학습지 생성기</title>
+  
+  <!-- 실시간 디버깅용 에러 트래커 -->
+  <script>
+    (function() {
+      function showError(msg) {
+        // 페이지 로드 완료 전이라도 body에 삽입할 수 있도록 준비
+        function inject() {
+          var panel = document.getElementById('_debug_panel');
+          if (!panel) {
+            panel = document.createElement('div');
+            panel.id = '_debug_panel';
+            panel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a0000;color:#ff6b6b;font-family:monospace;font-size:13px;padding:12px 16px;border-bottom:2px solid #ff0000;white-space:pre-wrap;word-break:break-all;max-height:40vh;overflow-y:auto;';
+            panel.innerHTML = '<strong>🚨 JavaScript 오류 발생 - 아래 메시지를 캡처해서 보내주세요:</strong>\n\n';
+            if (document.body) document.body.prepend(panel);
+            else document.addEventListener('DOMContentLoaded', function() { document.body.prepend(panel); });
+          }
+          panel.innerHTML += msg + '\n' + '─'.repeat(60) + '\n';
+        }
+        inject();
+      }
+
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          showError('[리소스 로드 실패]\n파일: ' + (e.target.src || e.target.href));
+        } else if (e.target && e.target.tagName === 'IMG') {
+          // 빈 src 이미지 오류는 무시 (동적으로 채워지는 이미지)
+          return;
+        } else if (e.message) {
+          showError('[런타임 오류]\n메시지: ' + e.message + '\n파일: ' + e.filename + '\n라인: ' + e.lineno + ':' + e.colno + (e.error ? '\n스택:\n' + e.error.stack : ''));
+        }
+      }, true);
+
+      window.addEventListener('unhandledrejection', function(e) {
+        showError('[Promise 거부 오류]\n' + (e.reason && e.reason.stack ? e.reason.stack : String(e.reason)));
+      });
+    })();
+  </script>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="대한민국 2022 개정 초등 교육과정에 기반한 6학년 세계 여러 나라의 국기, 수도, 위치 학습 프로그램 및 맞춤형 인쇄 학습지 생성 프로그램입니다.">
+  <meta name="keywords" content="초등사회, 6학년 사회, 세계 지리, 국기 퀴즈, 수도 퀴즈, 학습지 생성기, 초등학습지, 세계지도">
+  <meta name="author" content="Antigravity">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+
+  <!-- App Header (인쇄 시 숨겨짐) -->
+  <header class="glass-panel" id="app-header">
+    <div class="brand" id="go-home-logo" style="cursor: pointer;">
+      <span class="brand-icon">🌐</span>
+      <span>지도 학습기</span>
+    </div>
+    
+    <!-- Navigation Links (로그인 시 노출) -->
+    <nav class="nav-links hidden" id="nav-links">
+      <a class="nav-item active" data-target="dashboard-view">홈</a>
+      <a class="nav-item" data-target="flashcard-view">플래시 학습</a>
+      <a class="nav-item" data-target="study-view">지도 학습</a>
+      <a class="nav-item" data-target="quiz-view">온라인 퀴즈</a>
+      <a class="nav-item" data-target="worksheet-view">학습지 만들기</a>
+      <a class="nav-item" data-target="progress-view" id="nav-progress">📊 내 진도</a>
+    </nav>
+
+    <!-- Theme & Auth Control (로그인 시 노출) -->
+    <div class="user-profile">
+      <button class="theme-toggle-btn" id="theme-toggle" title="테마 변경">🌙</button>
+      <span class="hidden" id="user-status-text" style="font-size: 0.9rem; font-weight: 500;"></span>
+      <button class="btn btn-outline btn-icon" id="settings-btn" title="시스템 설정">⚙️</button>
+      <button class="btn btn-danger hidden" id="logout-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">로그아웃</button>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main>
+    
+    <!-- 1. Authentication View (로그인/회원가입) -->
+    <section class="view-section active" id="auth-view">
+      <div class="auth-container">
+        <div class="auth-card glass-panel">
+          <div class="auth-header">
+            <h1 class="text-gradient">지도 학습기</h1>
+            <p>초등 6학년 사회 세계 단원 학습 프로그램</p>
+          </div>
+          
+          <!-- Login Form -->
+          <div id="login-form-area">
+            <div class="form-group">
+              <label for="login-email">이메일 주소</label>
+              <input type="email" id="login-email" class="form-control" placeholder="teacher@school.es.kr">
+            </div>
+            <div class="form-group">
+              <label for="login-password">비밀번호</label>
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" id="btn-login" style="width: 100%; margin-top: 0.5rem;">로그인</button>
+            
+            <div class="divider">또는</div>
+            
+            <button class="btn btn-secondary" id="btn-guest" style="width: 100%;">로그인 없이 체험하기 (데모 모드)</button>
+            
+            <div class="auth-footer" style="margin-top: 1.5rem;">
+              아직 계정이 없으신가요? <a href="#" id="go-to-signup">회원가입</a>
+            </div>
+
+            <!-- 관리자 패널 진입 링크 -->
+            <div style="margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--card-border); text-align: center;">
+              <button class="btn-admin-entry" id="btn-go-admin-login" title="관리자용 로그인">
+                🔧 관리자 패널로 이동
+              </button>
+            </div>
+          </div>
+
+          <!-- Signup Form (기본적으로 숨겨짐) -->
+          <div class="hidden" id="signup-form-area">
+            <div class="form-group">
+              <label for="signup-name">이름 (선택)</label>
+              <input type="text" id="signup-name" class="form-control" placeholder="홍길동 교사">
+            </div>
+            <div class="form-group">
+              <label for="signup-email">이메일 주소</label>
+              <input type="email" id="signup-email" class="form-control" placeholder="name@domain.com">
+            </div>
+            <div class="form-group">
+              <label for="signup-password">비밀번호 (6자 이상)</label>
+              <input type="password" id="signup-password" class="form-control" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" id="btn-signup" style="width: 100%; margin-top: 0.5rem;">가입하기</button>
+            
+            <div class="auth-footer" style="margin-top: 1.5rem;">
+              이미 계정이 있으신가요? <a href="#" id="go-to-login">로그인하기</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.5 Mode Selection View (학습 모드 선택) -->
+    <section class="view-section" id="mode-select-view">
+      <div style="text-align: center; margin-bottom: 2rem; margin-top: 2rem;">
+        <h1 class="text-gradient" style="font-size: 2.5rem;">어떤 지역을 탐험할까요?</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 0.5rem;">학습하고 싶은 지역을 선택해주세요.</p>
+      </div>
+      
+      <div style="display: flex; gap: 2rem; max-width: 800px; margin: 0 auto; justify-content: center; flex-wrap: wrap;">
+        <!-- World Mode Card -->
+        <div class="menu-card glass-panel mode-card" id="btn-mode-world" style="cursor: pointer; flex: 1; min-width: 300px; text-align: center; padding: 3rem 2rem;">
+          <div style="font-size: 5rem; margin-bottom: 1rem;">🌍</div>
+          <h2>세계 여러 나라</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 1rem;">
+            전 세계 여러 나라의 위치, 국기, 수도를 학습합니다.
+          </p>
+        </div>
+
+        <!-- Korea Mode Card -->
+        <div class="menu-card glass-panel mode-card" id="btn-mode-korea" style="cursor: pointer; flex: 1; min-width: 300px; text-align: center; padding: 3rem 2rem; border: 1px solid rgba(99,102,241,0.3); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));">
+          <div style="margin: 0 auto 1.5rem auto; display: flex; justify-content: center; align-items: center; height: 6.5rem; width: 6rem; overflow: hidden; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); background: white;">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Unification_flag_of_Korea.svg" alt="한반도기" style="height: 100%; width: 100%; object-fit: cover; transform: scale(1.35);">
+          </div>
+          <h2 class="text-gradient">우리나라 시·군·구</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 1rem;">
+            대한민국 각 도별 주요 시·군·구의 위치와 특성을 학습합니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Dashboard View (메인 대시보드) -->
+    <section class="view-section" id="dashboard-view">
+      <div class="flex-row-between" style="margin-bottom: 1rem;">
+        <div>
+          <h1>안녕하세요, <span id="dashboard-user-name" class="text-gradient">학생</span>님!</h1>
+          <p style="color: var(--text-muted);">세계 여러 나라의 위치, 국기, 수도를 정복해 보세요!</p>
+        </div>
+        <div class="glass-panel" style="padding: 0.75rem 1.5rem; text-align: center;">
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">나의 학습 포인트</span>
+          <h2 id="user-points" style="color: var(--secondary); margin-top: 0.2rem;">0 P</h2>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- 0. Flashcard Study Card (NEW) -->
+        <div class="menu-card glass-panel" id="card-to-flashcard" style="cursor: pointer; border: 1px solid rgba(99,102,241,0.3); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));">
+          <div class="menu-icon">⚡</div>
+          <h2 class="text-gradient">플래시 학습 모드 <span style="font-size:0.65rem; background:var(--primary); color:#fff; padding:0.2rem 0.5rem; border-radius:4px; vertical-align:middle;">NEW</span></h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            대륙별 5개씩 끊어서 지도 위치 + 국기 + 수도를 보고 듣고 학습한 후, 확인 퀴즈로 복습하는 스마트 플래시카드 학습기입니다.
+          </p>
+          <button class="btn btn-primary" style="margin-top: auto; align-self: flex-start; background: linear-gradient(135deg, #6366f1, #8b5cf6);">플래시 학습 시작</button>
+        </div>
+
+        <!-- 1. Map Study Card -->
+        <div class="menu-card glass-panel" id="card-to-study" style="cursor: pointer;">
+          <div class="menu-icon">🗺️</div>
+          <h2>지도 학습 모드</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            상호작용 세계 지도를 클릭하며 나라별 이름, 국기, 수도, 상세한 특징과 문화재 정보를 탐색합니다.
+          </p>
+          <button class="btn btn-primary" style="margin-top: auto; align-self: flex-start;">학습 시작</button>
+        </div>
+
+        <!-- 2. Online Quiz Card -->
+        <div class="menu-card glass-panel" id="card-to-quiz" style="cursor: pointer;">
+          <div class="menu-icon">🏆</div>
+          <h2>온라인 퀴즈 게임</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            국기 맞히기, 수도 맞히기, 지도 위치 클릭 퀴즈에 도전해 하트를 지키고 높은 점수를 기록하여 칭호 배지를 획득하세요.
+          </p>
+          <button class="btn btn-secondary" style="margin-top: auto; align-self: flex-start;">퀴즈 도전</button>
+        </div>
+
+        <!-- 3. Worksheet Generator Card -->
+        <div class="menu-card glass-panel" id="card-to-worksheet" style="cursor: pointer;">
+          <div class="menu-icon">📝</div>
+          <h2>학습지 생성기 (교사용)</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            대륙 범위, 문항 수, 문제 유형을 자유롭게 설정하여 인쇄용 정식 초등 사회 학습지와 정답지를 만듭니다. (A4 PDF 저장 지원)
+          </p>
+          <button class="btn btn-outline" style="margin-top: auto; align-self: flex-start; border-color: var(--primary); color: var(--primary);">학습지 만들기</button>
+        </div>
+
+        <!-- 4. Teacher Students Card (교사 전용 - 역할에 따라 show/hide) -->
+        <div class="menu-card glass-panel hidden" id="card-to-teacher-students" style="cursor: pointer; border: 1px solid rgba(16,185,129,0.3); background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(5,150,105,0.06));">
+          <div class="menu-icon">📋</div>
+          <h2 style="color: var(--secondary);">내 반 학생 현황</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            담당 반 학생들의 포인트, 퀴즈 기록, 배지 획득 현황을 한눈에 확인하고 학습 진도를 관리하세요.
+          </p>
+          <button class="btn" style="margin-top: auto; align-self: flex-start; background: linear-gradient(135deg, #10b981, #059669); color: #fff;">학생 관리</button>
+        </div>
+      </div>
+
+      <!-- Badges Section -->
+      <div class="glass-panel" style="padding: 2rem; margin-top: 1.5rem;">
+        <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">🎖️ 획득한 명예 배지</h2>
+        <div class="flex-row-between" id="badge-container" style="justify-content: flex-start; gap: 2rem; flex-wrap: wrap;">
+          <div style="text-align: center; opacity: 0.3;" id="badge-welcome" title="첫 회원가입 또는 체험 시작 시 지급">
+            <div style="font-size: 3.2rem;">👶</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">꼬마 탐험가</div>
+          </div>
+          <div style="text-align: center; opacity: 0.3;" id="badge-quiz1" title="퀴즈에서 첫 100점을 획득">
+            <div style="font-size: 3.2rem;">💯</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">척척박사</div>
+          </div>
+          <div style="text-align: center; opacity: 0.3;" id="badge-asia" title="아시아 대륙 국가 퀴즈를 완벽하게 통과">
+            <div style="font-size: 3.2rem;">🐉</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">아시아 마스터</div>
+          </div>
+          <div style="text-align: center; opacity: 0.3;" id="badge-europe" title="유럽 대륙 국가 퀴즈를 완벽하게 통과">
+            <div style="font-size: 3.2rem;">🏰</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">유럽 마스터</div>
+          </div>
+          <div style="text-align: center; opacity: 0.3;" id="badge-korea" title="국내 지리 퀴즈 또는 플래시를 완벽하게 통과">
+            <div style="font-size: 3.2rem;">🇰🇷</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">국토 사랑</div>
+          </div>
+          <div style="text-align: center; opacity: 0.3;" id="badge-world" title="포인트 1,000점 돌파">
+            <div style="font-size: 3.2rem;">👑</div>
+            <div style="font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem;">세계 정복자</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Study View (세계 지도 학습 모드) -->
+    <section class="view-section" id="study-view">
+      <div class="study-container">
+        <!-- Left Map Area -->
+        <div class="map-wrapper glass-panel">
+          <div class="map-toolbar">
+            <div class="continent-filters" id="continent-filters">
+              <button class="filter-chip active" data-continent="all">전체</button>
+              <button class="filter-chip" data-continent="아시아">아시아</button>
+              <button class="filter-chip" data-continent="유럽">유럽</button>
+              <button class="filter-chip" data-continent="북아메리카">북아메리카</button>
+              <button class="filter-chip" data-continent="남아메리카">남아메리카</button>
+              <button class="filter-chip" data-continent="아프리카">아프리카</button>
+              <button class="filter-chip" data-continent="오세아니아">오세아니아</button>
+            </div>
+            
+            <div class="search-box">
+              <input type="text" id="map-search-input" placeholder="국가명 또는 수도 검색...">
+            </div>
+          </div>
+          
+          <!-- Interactive SVG World Map Container -->
+          <div class="map-container" id="map-container">
+            <!-- SVG will be injected here dynamically by js/map.js -->
+          </div>
+        </div>
+
+        <!-- Right Detail Info Panel -->
+        <div class="sidebar-panel glass-panel" id="detail-panel">
+          <!-- Default State -->
+          <div id="detail-default-state" class="flex-center" style="flex-direction: column; height: 100%; text-align: center; gap: 1rem; color: var(--text-muted);">
+            <div style="font-size: 4rem;">🧭</div>
+            <h3>국가를 선택하세요</h3>
+            <p style="font-size: 0.9rem;">지도에서 특정 국가를 클릭하거나 검색 창에서 검색하면 자세한 국가 정보 카드가 표시됩니다.</p>
+          </div>
+          
+          <!-- Detailed State (Hidden by default) -->
+          <div id="detail-active-state" class="hidden">
+            <button class="back-to-list-btn" id="btn-back-to-list">⬅ 목록으로</button>
+            <div class="info-header">
+              <img alt="국기" class="info-flag-img" id="detail-flag-img">
+              <div class="info-names">
+                <h2 id="detail-country-name">대한민국</h2>
+                <p id="detail-eng-name">South Korea</p>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <span class="info-section-title">대륙</span>
+              <div class="info-section-content" id="detail-continent">아시아</div>
+            </div>
+
+            <div class="info-section">
+              <span class="info-section-title">수도</span>
+              <div class="info-section-content" id="detail-capital" style="font-weight: 700; font-size: 1.1rem;">서울 (Seoul)</div>
+            </div>
+
+            <div class="info-section">
+              <span class="info-section-title">위치</span>
+              <div class="info-section-content" id="detail-location">아시아 동부 한반도에 위치</div>
+            </div>
+
+            <div class="info-section">
+              <span class="info-section-title">특징 (초등 수준 상식)</span>
+              <div class="info-section-content" id="detail-trivia" style="line-height: 1.6;">
+                한글을 사용하며 불국사, 한옥 등의 문화유산과 세계적인 IT 산업국가...
+              </div>
+            </div>
+
+            <div class="info-section" style="border-bottom: none; padding-bottom: 0;">
+              <span class="info-section-title" style="margin-bottom: 0.5rem;">대표 명소 / 문화재</span>
+              <div id="detail-landmarks">
+                <!-- landmark-tags will be injected here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Quiz View (온라인 퀴즈 게임) -->
+    <section class="view-section" id="quiz-view">
+      
+      <!-- Quiz Setup Screen -->
+      <div id="quiz-setup-area" class="quiz-wrapper glass-panel">
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <h1 class="text-gradient">🥇 지리 퀴즈 대도전</h1>
+          <p style="color: var(--text-muted); margin-top: 0.4rem;">학습한 나라들의 위치, 국기, 수도를 재미있는 퀴즈로 복습해 보세요!</p>
+        </div>
+        
+        <div class="form-group">
+          <label style="font-size: 1rem; margin-bottom: 0.5rem;">1. 출제 대륙 선택</label>
+          <div class="continent-filters" id="quiz-setup-continents" style="gap: 0.5rem;">
+            <button class="filter-chip active" data-continent="all">전세계 전체</button>
+            <button class="filter-chip" data-continent="아시아">아시아</button>
+            <button class="filter-chip" data-continent="유럽">유럽</button>
+            <button class="filter-chip" data-continent="북아메리카">북아메리카</button>
+            <button class="filter-chip" data-continent="남아메리카">남아메리카</button>
+            <button class="filter-chip" data-continent="아프리카">아프리카</button>
+            <button class="filter-chip" data-continent="오세아니아">오세아니아</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label style="font-size: 1rem; margin-bottom: 0.5rem;">2. 퀴즈 유형 선택</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <button class="btn btn-outline quiz-type-select active" data-type="flag">🏳️ 국기 보고 나라 맞히기</button>
+            <button class="btn btn-outline quiz-type-select" data-type="capital">🏛️ 수도 보고 나라 맞히기</button>
+            <button class="btn btn-outline quiz-type-select" data-type="map">📍 지도 위치로 나라 찾기</button>
+            <button class="btn btn-outline quiz-type-select" data-type="mixed">🔄 무작위 믹스 퀴즈</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-quiz-start" style="padding: 1rem; font-size: 1.1rem; margin-top: 1.5rem;">퀴즈 대전 시작하기</button>
+      </div>
+
+      <!-- Active Quiz Interface -->
+      <div id="quiz-active-area" class="quiz-wrapper glass-panel hidden">
+        <div class="quiz-header">
+          <div>
+            <span id="quiz-title-badge" style="background: var(--primary); color: #fff; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">국기 맞히기</span>
+            <span style="margin-left: 0.5rem; font-weight: 600;" id="quiz-question-number">문제 1/10</span>
+          </div>
+          
+          <div class="quiz-stats">
+            <div style="font-weight: 700; color: var(--accent);">점수: <span id="quiz-score-display">0</span></div>
+            <div class="heart-container" id="quiz-hearts">
+              <span>❤️</span><span>❤️</span><span>❤️</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="quiz-progress-container">
+          <div class="quiz-progress-bar" id="quiz-progress-bar"></div>
+        </div>
+
+        <!-- Question Body Area -->
+        <div class="quiz-question-card glass-panel">
+          <h2 id="quiz-question-prompt">이 국기를 가진 나라는 어디일까요?</h2>
+          
+          <!-- Image/Flag element (for flag quiz) -->
+          <img alt="국기 퀴즈" class="quiz-flag-display hidden" id="quiz-flag-img">
+          
+          <!-- Large Text Prompt (for capital/text quiz) -->
+          <h1 id="quiz-text-prompt" class="hidden" style="font-size: 3rem; margin: 1rem 0;">런던</h1>
+          
+          <!-- Mini SVG map for map question (displays simple highlight) -->
+          <div class="quiz-map-container hidden" id="quiz-map-container">
+            <!-- Map SVG injected here for clicking -->
+          </div>
+        </div>
+
+        <!-- Answers Area: Multiple choice 4 options -->
+        <div class="quiz-options-grid" id="quiz-options-area">
+          <button class="quiz-option-btn" data-index="0"><span>1. 대한민국</span><span></span></button>
+          <button class="quiz-option-btn" data-index="1"><span>2. 중국</span><span></span></button>
+          <button class="quiz-option-btn" data-index="2"><span>3. 일본</span><span></span></button>
+          <button class="quiz-option-btn" data-index="3"><span>4. 몽골</span><span></span></button>
+        </div>
+
+        <div class="flex-row-between" style="margin-top: 1rem;">
+          <button class="btn btn-outline" id="btn-quiz-exit">퀴즈 그만두기</button>
+          <button class="btn btn-primary hidden" id="btn-quiz-next">다음 문제 ➡️</button>
+        </div>
+      </div>
+
+      <!-- Quiz Finished / Results View -->
+      <div id="quiz-result-area" class="quiz-wrapper glass-panel hidden">
+        <div class="quiz-result-card">
+          <div style="font-size: 5rem;">🎉</div>
+          <h1 class="text-gradient">퀴즈 완료!</h1>
+          <p style="font-size: 1.2rem; font-weight: 500;" id="quiz-result-summary">축하합니다! 10문제 중 9문제를 맞혔습니다!</p>
+          
+          <div class="glass-panel" style="padding: 1.5rem 3rem; margin: 1rem 0; display: flex; gap: 4rem; justify-content: center;">
+            <div style="text-align: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">최종 점수</span>
+              <h2 style="color: var(--accent); margin-top: 0.2rem;" id="quiz-result-score">90점</h2>
+            </div>
+            <div style="text-align: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">획득 포인트</span>
+              <h2 style="color: var(--secondary); margin-top: 0.2rem;" id="quiz-result-points">+180 P</h2>
+            </div>
+          </div>
+
+          <!-- Earned Badge Notification -->
+          <div class="hidden" id="result-badge-earned-area" style="text-align: center; border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem 2rem; border-radius: 12px; background: rgba(245, 158, 11, 0.05);">
+            <div class="badge-earned" id="result-badge-icon">👑</div>
+            <h3 style="color: var(--accent); margin-top: 0.5rem;" id="result-badge-name">세계 정복자 배지 획득!</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">배지가 홈 대시보드에 활성화되었습니다.</p>
+          </div>
+
+          <div style="display: flex; gap: 1rem; width: 100%; justify-content: center; margin-top: 1rem;">
+            <button class="btn btn-outline" id="btn-quiz-restart" style="flex: 1; max-width: 200px;">다시 도전</button>
+            <button class="btn btn-primary" id="btn-quiz-finish-home" style="flex: 1; max-width: 200px;">홈으로 이동</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Worksheet View (인쇄용 학습지 생성기) -->
+    <section class="view-section" id="worksheet-view">
+      <div class="worksheet-layout">
+        
+        <!-- Left Configuration Sidebar (인쇄 시 숨겨짐) -->
+        <div class="worksheet-sidebar glass-panel">
+          <h2>학습지 조건 설정</h2>
+          
+          <!-- Title input -->
+          <div class="form-group">
+            <label for="ws-title-input">학습지 제목</label>
+            <input type="text" id="ws-title-input" class="form-control" value="세계 여러 나라의 이름과 수도 평가 학습지">
+          </div>
+          
+          <!-- Continent Range Selection -->
+          <div class="form-group">
+            <label>국가 포함 범위 (대륙)</label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.3rem;" id="ws-continents-checkboxes">
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="아시아" checked> 아시아
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="유럽" checked> 유럽
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="북아메리카" checked> 북아메리카
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="남아메리카" checked> 남아메리카
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="아프리카" checked> 아프리카
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" value="오세아니아" checked> 오세아니아
+              </label>
+            </div>
+          </div>
+
+          <!-- Question Type Selection -->
+          <div class="form-group">
+            <label for="ws-question-type">출제 유형</label>
+            <select id="ws-question-type" class="form-control">
+              <option value="mixed">무작위 혼합형 (최고 추천)</option>
+              <option value="multiple-choice">1. 객관식 퀴즈형 (나라/수도/국기)</option>
+              <option value="write-capital">2. 주관식 단답형 (수도 이름 쓰기)</option>
+              <option value="matching">3. 선 긋기 연결형 (나라 - 국기 - 수도)</option>
+            </select>
+          </div>
+
+          <!-- Question Count -->
+          <div class="form-group">
+            <label for="ws-count-select">문항 수</label>
+            <select id="ws-count-select" class="form-control">
+              <option value="5">5 문항</option>
+              <option value="10" selected>10 문항 (A4 1페이지 최적)</option>
+              <option value="15">15 문항</option>
+              <option value="20">20 문항 (A4 2페이지 분량)</option>
+            </select>
+          </div>
+
+          <!-- Answer Sheet Toggle -->
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="ws-toggle-answerkey" checked>
+              <span>답안지 포함 인쇄</span>
+            </label>
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+            <button class="btn btn-primary" id="btn-generate-ws" style="width: 100%;">⚙️ 학습지 생성/새로고침</button>
+            <button class="btn btn-secondary" id="btn-print-ws" style="width: 100%;">🖨️ 학습지 인쇄 / PDF 저장</button>
+          </div>
+        </div>
+
+        <!-- Right Worksheet Live Preview Area -->
+        <div class="worksheet-preview-area">
+          <div id="worksheet-preview">
+            <!-- A4 pages will be dynamically injected here by js/worksheet.js -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- 6. Flashcard View (플래시 학습 모드) -->
+    <section class="view-section" id="flashcard-view">
+      <div class="fc-wrapper">
+
+        <!-- ── 대륙 선택 화면 ─────────────────────────────────── -->
+        <div id="fc-continent-select">
+          <div class="fc-header">
+            <h1 class="text-gradient">⚡ 플래시 학습 모드</h1>
+            <p style="color:var(--text-muted); margin-top:0.4rem;">학습할 대륙을 선택하세요. 5개국씩 끊어서 지도·국기·수도를 보고 듣고 익힌 후 확인 퀴즈로 마무리합니다.</p>
+          </div>
+          <div class="fc-continent-grid" id="fc-continent-grid">
+            <!-- JS로 주입 -->
+          </div>
+        </div>
+
+        <!-- ── 그룹 선택 화면 ─────────────────────────────────── -->
+        <div id="fc-group-select" class="hidden">
+          <div class="fc-header">
+            <button class="btn btn-outline fc-back-btn" id="fc-back-to-continents-from-groups">← 대륙 선택으로</button>
+            <div>
+              <h2 id="fc-gs-title" class="text-gradient">아시아 학습 그룹 선택</h2>
+              <p id="fc-gs-subtitle" style="color:var(--text-muted); font-size:0.9rem;"></p>
+            </div>
+          </div>
+          <div class="fc-group-list" id="fc-group-list">
+            <!-- JS로 주입 -->
+          </div>
+        </div>
+
+        <!-- ── 카드 학습 화면 ─────────────────────────────────── -->
+        <div id="fc-learn-area" class="hidden">
+          <!-- 상단 헤더 -->
+          <div class="fc-learn-header">
+            <button class="btn btn-outline fc-back-btn" id="fc-back-to-groups-from-learn">← 그룹 목록</button>
+            <div class="fc-learn-meta">
+              <span id="fc-group-label" style="font-size:0.85rem; color:var(--text-muted);">아시아 · 그룹 1</span>
+              <span id="fc-progress-text" style="font-weight:700; color:var(--primary);">1 / 5</span>
+            </div>
+            <div class="fc-learn-controls">
+              <button class="btn btn-outline fc-auto-toggle-btn" id="fc-auto-toggle">⏸ 자동넘김 ON</button>
+              <select class="form-control" id="fc-speed-select" style="padding:0.35rem 0.6rem; font-size:0.85rem;">
+                <option value="3000">빠르게 (3초)</option>
+                <option value="4500" selected>보통 (4.5초)</option>
+                <option value="6000">느리게 (6초)</option>
+                <option value="9000">매우 느리게 (9초)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 진행 바 -->
+          <div class="fc-progress-container">
+            <div class="fc-progress-bar" id="fc-learn-progress-bar"></div>
+          </div>
+
+          <!-- 메인 학습 영역: 지도 + 카드 -->
+          <div class="fc-learn-main">
+            <!-- 좌: 미니 지도 -->
+            <div class="fc-mini-map-area glass-panel">
+              <div class="fc-mini-map" id="fc-mini-map"></div>
+            </div>
+
+            <!-- 우: 플래시 카드 -->
+            <div class="fc-card glass-panel">
+              <img alt="" class="fc-card-flag" id="fc-card-flag">
+              <h2 class="fc-card-name" id="fc-card-name">대한민국</h2>
+              <p class="fc-card-engname" id="fc-card-engname">South Korea</p>
+              <div class="fc-card-divider"></div>
+              <div class="fc-card-info-row">
+                <span class="fc-card-label">🏛️ 수도</span>
+                <span class="fc-card-capital" id="fc-card-capital">서울</span>
+                <span class="fc-card-engcapital" id="fc-card-engcapital">(Seoul)</span>
+              </div>
+              <div class="fc-card-info-row" style="margin-top:0.5rem;">
+                <span class="fc-card-label">📍 위치</span>
+                <span style="font-size:0.9rem; color:var(--text-muted);" id="fc-card-location"></span>
+              </div>
+              <div class="fc-card-info-row hidden" style="margin-top:0.5rem;" id="fc-card-symbol-row">
+                <span class="fc-card-label">🌸 상징</span>
+                <span style="font-size:0.9rem; color:var(--text-muted);" id="fc-card-symbols-content"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 네비게이션 -->
+          <div class="fc-learn-nav">
+            <button class="btn btn-outline" id="fc-btn-prev">← 이전</button>
+            <button class="btn btn-primary" id="fc-btn-next">다음 ➡️</button>
+          </div>
+        </div>
+
+        <!-- ── 확인 퀴즈 화면 ─────────────────────────────────── -->
+        <div id="fc-quiz-area" class="hidden">
+          <div class="fc-quiz-header">
+            <button class="btn btn-outline fc-back-btn" id="fc-back-to-groups-from-quiz">← 그룹 목록</button>
+            <div>
+              <span id="fc-quiz-type-badge" style="background:var(--primary);color:#fff;padding:0.3rem 0.7rem;border-radius:6px;font-size:0.8rem;font-weight:700;">국기 맞히기</span>
+              <span id="fc-quiz-progress-text" style="margin-left:0.8rem;font-weight:700;">1 / 5</span>
+            </div>
+          </div>
+          <div class="fc-progress-container">
+            <div class="fc-progress-bar" style="background:var(--secondary);" id="fc-quiz-progress-bar"></div>
+          </div>
+
+          <div class="fc-quiz-card glass-panel">
+            <h2 id="fc-quiz-prompt" style="margin-bottom:1.2rem;">이 국기를 사용하는 나라는 어디일까요?</h2>
+            <div id="fc-quiz-flag-area" class="hidden" style="text-align:center;margin-bottom:1rem;"></div>
+            <div id="fc-quiz-text-area" class="hidden" style="text-align:center;margin-bottom:1rem;"></div>
+            <div class="quiz-options-grid" id="fc-quiz-options"></div>
+            <div style="text-align:right; margin-top:1rem;">
+              <button class="btn btn-primary hidden" id="fc-quiz-next-btn">다음 문제 ➡️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 결과 화면 ──────────────────────────────────────── -->
+        <div id="fc-result-area" class="hidden">
+          <div class="fc-result-card glass-panel">
+            <div id="fc-result-emoji" style="font-size:5rem;">🏆</div>
+            <h2 class="text-gradient" style="margin-top:0.5rem;">학습 완료!</h2>
+            <p id="fc-result-msg" style="color:var(--text-muted); margin-top:0.4rem;">완벽합니다!</p>
+            <div id="fc-result-stars" style="margin:1rem 0;"></div>
+            <div class="fc-result-scores glass-panel">
+              <div style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted);">퀴즈 정답</div>
+                <div style="font-size:2.5rem; font-weight:800; color:var(--accent);" id="fc-result-score">5/5</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted);">점수</div>
+                <div style="font-size:2.5rem; font-weight:800; color:var(--secondary);" id="fc-result-pct">100점</div>
+              </div>
+            </div>
+
+            <!-- 배지 획득 알림 영역 -->
+            <div class="hidden" id="fc-result-badge-earned-area" style="text-align: center; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.8rem 1.5rem; border-radius: 12px; background: rgba(245, 158, 11, 0.05); margin-bottom: 1rem; width: 100%;">
+              <div class="badge-earned" id="fc-result-badge-icon" style="font-size: 3rem;">👑</div>
+              <h3 style="color: var(--accent); margin-top: 0.3rem;" id="fc-result-badge-name">세계 정복자 배지 획득!</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem;">배지가 홈 대시보드에 활성화되었습니다.</p>
+            </div>
+
+            <div class="fc-result-actions">
+              <button class="btn btn-outline" id="fc-btn-retry-group">🔄 다시 학습</button>
+              <button class="btn btn-outline" id="fc-btn-retry-quiz">✏️ 퀴즈 다시 풀기</button>
+              <button class="btn btn-primary" id="fc-btn-next-group">다음 그룹 ➡️</button>
+              <button class="btn btn-secondary" id="fc-btn-back-home">🏠 대륙 선택</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 오답 학습 화면 ─────────────────────────────────── -->
+        <div id="fc-wrong-area" class="hidden">
+          <!-- JS로 주입 -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 8. Admin View (전체 관리자 패널) -->
+    <section class="view-section" id="admin-view">
+
+      <!-- 상단 헤더 -->
+      <div class="admin-header-row">
+        <div>
+          <h1>🔧 전체 <span class="text-gradient">관리자 패널</span></h1>
+          <p style="color:var(--text-muted);">선생님 · 학생 계정과 학교/학년/반 정보를 통합 관리합니다.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <span id="admin-total-count" class="role-badge admin">전체 0명</span>
+          <button class="btn btn-primary" id="btn-admin-show-create">+ 계정 추가</button>
+        </div>
+      </div>
+
+      <!-- 탭 -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-admin-tab="list">📋 계정 목록</button>
+        <button class="admin-tab" data-admin-tab="create">➕ 계정 등록</button>
+        <button class="admin-tab" data-admin-tab="bulk">📦 일괄 등록</button>
+      </div>
+
+      <!-- 계정 목록 탭 -->
+      <div class="admin-tab-content active" id="admin-tab-list">
+        <!-- 필터 행 -->
+        <div class="admin-filter-row">
+          <select id="admin-filter-role" class="form-control" style="width:auto;">
+            <option value="all">전체 역할</option>
+            <option value="admin">관리자</option>
+            <option value="teacher">선생님</option>
+            <option value="student">학생</option>
+          </select>
+          <select id="admin-filter-grade" class="form-control" style="width:auto;">
+            <option value="all">전체 학년</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+            <option value="4">4학년</option>
+            <option value="5">5학년</option>
+            <option value="6">6학년</option>
+          </select>
+          <select id="admin-filter-class" class="form-control" style="width:auto;">
+            <option value="all">전체 반</option>
+            <option value="1">1반</option>
+            <option value="2">2반</option>
+            <option value="3">3반</option>
+            <option value="4">4반</option>
+            <option value="5">5반</option>
+            <option value="6">6반</option>
+            <option value="7">7반</option>
+            <option value="8">8반</option>
+          </select>
+          <input type="text" id="admin-filter-search" class="form-control" placeholder="이름 또는 이메일 검색..." style="min-width:180px;">
+          <button class="btn btn-outline" id="btn-admin-filter" style="padding:0.5rem 1rem;">🔍 필터</button>
+        </div>
+
+        <!-- 계정 테이블 -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-users-table">
+            <thead>
+              <tr>
+                <th>역할</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>비밀번호</th>
+                <th>학교</th>
+                <th>학년/반/번호</th>
+                <th>포인트</th>
+                <th>배지</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ 불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 계정 등록 탭 -->
+      <div class="admin-tab-content" id="admin-tab-create">
+        <div class="glass-panel" style="padding:2rem;max-width:700px;">
+          <h2 style="margin-bottom:1.5rem;">➕ 새 계정 등록</h2>
+          <div class="admin-form-grid">
+            <div class="form-group">
+              <label>역할 *</label>
+              <select id="ac-role" class="form-control">
+                <option value="student">학생</option>
+                <option value="teacher">선생님</option>
+                <option value="admin">관리자</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>학교명 *</label>
+              <input type="text" id="ac-school" class="form-control" placeholder="한빛초등학교">
+            </div>
+            <div class="form-group">
+              <label>학년</label>
+              <select id="ac-grade" class="form-control">
+                <option value="">-</option>
+                <option value="1">1학년</option>
+                <option value="2">2학년</option>
+                <option value="3">3학년</option>
+                <option value="4">4학년</option>
+                <option value="5">5학년</option>
+                <option value="6">6학년</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>반</label>
+              <input type="number" id="ac-class" class="form-control" placeholder="예: 3" min="1" max="20">
+            </div>
+            <div class="form-group">
+              <label>출석번호 (학생만)</label>
+              <input type="number" id="ac-studentnum" class="form-control" placeholder="예: 15" min="1" max="50">
+            </div>
+            <div class="form-group">
+              <label>이름 *</label>
+              <input type="text" id="ac-name" class="form-control" placeholder="홍길동">
+            </div>
+            <div class="form-group">
+              <label>이메일 *</label>
+              <input type="email" id="ac-email" class="form-control" placeholder="student@school.kr">
+            </div>
+            <div class="form-group">
+              <label>비밀번호 *</label>
+              <input type="text" id="ac-password" class="form-control" placeholder="초기 비밀번호">
+            </div>
+          </div>
+          <div style="display:flex;gap:0.75rem;margin-top:1rem;">
+            <button class="btn btn-primary" id="btn-ac-submit">계정 생성</button>
+            <button class="btn btn-outline" id="btn-ac-reset">초기화</button>
+          </div>
+          <div id="ac-result-msg" style="margin-top:1rem;font-size:0.9rem;"></div>
+        </div>
+      </div>
+
+      <!-- 일괄 등록 탭 -->
+      <div class="admin-tab-content" id="admin-tab-bulk">
+        <div class="glass-panel" style="padding:2rem;max-width:600px;">
+          <h2 style="margin-bottom:0.5rem;">📦 학생 일괄 등록</h2>
+          <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.5rem;">한 반 학생 전체를 자동으로 생성합니다. 이메일은 <code>학년-반-번호@school.kr</code> 형식으로 생성됩니다.</p>
+          <div class="admin-form-grid">
+            <div class="form-group">
+              <label>학교명 *</label>
+              <input type="text" id="bk-school" class="form-control" placeholder="한빛초등학교">
+            </div>
+            <div class="form-group">
+              <label>학년 *</label>
+              <select id="bk-grade" class="form-control">
+                <option value="">선택</option>
+                <option value="1">1학년</option>
+                <option value="2">2학년</option>
+                <option value="3">3학년</option>
+                <option value="4">4학년</option>
+                <option value="5">5학년</option>
+                <option value="6">6학년</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>반 *</label>
+              <input type="number" id="bk-class" class="form-control" placeholder="예: 3" min="1" max="20">
+            </div>
+            <div class="form-group">
+              <label>학생 수 *</label>
+              <input type="number" id="bk-count" class="form-control" placeholder="예: 30" min="1" max="50">
+            </div>
+          </div>
+          <div class="bulk-preview-box" id="bulk-preview">
+            <p style="color:var(--text-muted);font-size:0.85rem;">위 정보를 입력하면 생성될 계정 미리보기가 표시됩니다.</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;margin-top:1rem;">
+            <button class="btn btn-outline" id="btn-bk-preview">미리보기</button>
+            <button class="btn btn-primary" id="btn-bk-submit">일괄 생성</button>
+          </div>
+          <div id="bk-result-msg" style="margin-top:1rem;font-size:0.9rem;"></div>
+        </div>
+      </div>
+
+      <!-- 편집 모달 -->
+      <div class="admin-edit-modal" id="admin-edit-modal">
+        <div class="admin-edit-card glass-panel">
+          <h2 style="margin-bottom:1.5rem;">✏️ 계정 편집</h2>
+          <input type="hidden" id="edit-uid">
+          <div class="admin-form-grid">
+            <div class="form-group">
+              <label>역할</label>
+              <select id="edit-role" class="form-control">
+                <option value="student">학생</option>
+                <option value="teacher">선생님</option>
+                <option value="admin">관리자</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>학교명</label>
+              <input type="text" id="edit-school" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>학년</label>
+              <select id="edit-grade" class="form-control">
+                <option value="">-</option>
+                <option value="1">1학년</option>
+                <option value="2">2학년</option>
+                <option value="3">3학년</option>
+                <option value="4">4학년</option>
+                <option value="5">5학년</option>
+                <option value="6">6학년</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>반</label>
+              <input type="number" id="edit-class" class="form-control" min="1" max="20">
+            </div>
+            <div class="form-group">
+              <label>출석번호</label>
+              <input type="number" id="edit-studentnum" class="form-control" min="1" max="50">
+            </div>
+            <div class="form-group">
+              <label>이름</label>
+              <input type="text" id="edit-name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>이메일</label>
+              <input type="email" id="edit-email" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>비밀번호</label>
+              <input type="text" id="edit-password" class="form-control">
+            </div>
+          </div>
+          <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
+            <button class="btn btn-primary" id="btn-edit-save">저장</button>
+            <button class="btn btn-outline" id="btn-edit-cancel">취소</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 9. Teacher Students View (선생님 학생 현황) -->
+    <section class="view-section" id="teacher-students-view">
+
+      <div class="admin-header-row">
+        <div>
+          <h1>📋 내 반 <span class="text-gradient">학생 현황</span></h1>
+          <p style="color:var(--text-muted);" id="teacher-class-label">담당 반 학생들의 학습 현황을 확인하세요.</p>
+        </div>
+        <button class="btn btn-outline" id="btn-back-dashboard" style="align-self:center;">← 대시보드로</button>
+      </div>
+
+      <!-- 반 통계 요약 -->
+      <div class="progress-summary-grid" id="class-stats-grid" style="margin-bottom:1.5rem;">
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">👥</div>
+          <div class="ps-value" id="ts-total">0</div>
+          <div class="ps-label">전체 학생</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">⭐</div>
+          <div class="ps-value" id="ts-avg-points">0</div>
+          <div class="ps-label">반 평균 포인트</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">🏆</div>
+          <div class="ps-value" id="ts-quiz-done">0%</div>
+          <div class="ps-label">퀴즈 참여율</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">🎖️</div>
+          <div class="ps-value" id="ts-badge-total">0</div>
+          <div class="ps-label">총 획득 배지</div>
+        </div>
+      </div>
+
+      <!-- 학생 목록 테이블 -->
+      <div class="glass-panel" style="padding:1.5rem;">
+        <h2 style="margin-bottom:1rem;">🧑‍🎓 학생 목록 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">클릭하면 상세 학습 현황을 확인합니다</span></h2>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" id="teacher-students-table">
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>포인트</th>
+                <th>퀴즈 횟수</th>
+                <th>배지</th>
+                <th>최근 퀴즈</th>
+              </tr>
+            </thead>
+            <tbody id="teacher-students-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ 불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 학생 상세 슬라이드업 패널 -->
+      <div class="student-detail-overlay" id="student-detail-overlay">
+        <div class="student-detail-panel glass-panel">
+          <div class="sdp-header">
+            <div>
+              <h2 id="sdp-name">학생 이름</h2>
+              <p id="sdp-info" style="color:var(--text-muted);font-size:0.88rem;"></p>
+            </div>
+            <button class="btn btn-outline" id="btn-sdp-close" style="padding:0.4rem 0.8rem;">✕ 닫기</button>
+          </div>
+          <div class="sdp-body">
+            <!-- 요약 -->
+            <div class="progress-summary-grid" style="grid-template-columns:repeat(3,1fr);">
+              <div class="progress-stat-card glass-panel">
+                <div class="ps-icon">⭐</div>
+                <div class="ps-value" id="sdp-points">0</div>
+                <div class="ps-label">포인트</div>
+              </div>
+              <div class="progress-stat-card glass-panel">
+                <div class="ps-icon">🏆</div>
+                <div class="ps-value" id="sdp-quiz-count">0</div>
+                <div class="ps-label">퀴즈 횟수</div>
+              </div>
+              <div class="progress-stat-card glass-panel">
+                <div class="ps-icon">🎖️</div>
+                <div class="ps-value" id="sdp-badge-count">0</div>
+                <div class="ps-label">배지 수</div>
+              </div>
+            </div>
+            <!-- 퀴즈 기록 -->
+            <div style="margin-top:1.5rem;">
+              <h3 style="margin-bottom:0.75rem;">📝 최근 퀴즈 기록 (최대 10개)</h3>
+              <div id="sdp-quiz-history" style="overflow-x:auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 7. Progress View (학습 현황 대시보드) -->
+    <section class="view-section" id="progress-view">
+
+      <!-- 상단 타이틀 -->
+      <div style="margin-bottom:0.5rem;">
+        <h1>📊 나의 <span class="text-gradient">학습 현황</span></h1>
+        <p style="color:var(--text-muted);">지금까지 쌓아온 나의 모든 학습 기록을 한눈에 확인하세요.</p>
+      </div>
+
+      <!-- 요약 카드 4개 -->
+      <div class="progress-summary-grid" id="pg-summary-grid">
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">⭐</div>
+          <div class="ps-value" id="pg-total-points">0</div>
+          <div class="ps-label">누적 포인트</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">🏆</div>
+          <div class="ps-value" id="pg-quiz-count">0</div>
+          <div class="ps-label">퀴즈 도전 횟수</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">⚡</div>
+          <div class="ps-value" id="pg-fc-count">0</div>
+          <div class="ps-label">완료 플래시 그룹</div>
+        </div>
+        <div class="progress-stat-card glass-panel">
+          <div class="ps-icon">🎖️</div>
+          <div class="ps-value" id="pg-badge-count">0</div>
+          <div class="ps-label">획득 배지</div>
+        </div>
+      </div>
+
+      <!-- 두 컬럼 레이아웃 -->
+      <div class="progress-two-col">
+
+        <!-- 왼쪽: 퀴즈 기록 + 배지 -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+          <!-- 퀴즈 기록 테이블 -->
+          <div class="glass-panel" style="padding:1.5rem;">
+            <h2 style="margin-bottom:1rem;">🏆 퀴즈 도전 기록</h2>
+            <div id="pg-quiz-history-wrap" style="overflow-x:auto;">
+              <p style="color:var(--text-muted);text-align:center;padding:2rem;">⏳ 불러오는 중...</p>
+            </div>
+          </div>
+
+          <!-- 배지 섹션 -->
+          <div class="glass-panel" style="padding:1.5rem;">
+            <h2 style="margin-bottom:1rem;">🎖️ 획득한 명예 배지</h2>
+            <div class="progress-badge-row" id="pg-badge-row">
+              <div class="pg-badge-item" id="pg-badge-welcome" title="첫 로그인 또는 체험 시작">
+                <div style="font-size:2.8rem;">👶</div>
+                <div class="pg-badge-name">꼬마 탐험가</div>
+              </div>
+              <div class="pg-badge-item" id="pg-badge-quiz1" title="퀴즈 첫 100점">
+                <div style="font-size:2.8rem;">💯</div>
+                <div class="pg-badge-name">척척박사</div>
+              </div>
+              <div class="pg-badge-item" id="pg-badge-asia" title="아시아 퀴즈 완벽 통과">
+                <div style="font-size:2.8rem;">🐉</div>
+                <div class="pg-badge-name">아시아 마스터</div>
+              </div>
+              <div class="pg-badge-item" id="pg-badge-europe" title="유럽 퀴즈 완벽 통과">
+                <div style="font-size:2.8rem;">🏰</div>
+                <div class="pg-badge-name">유럽 마스터</div>
+              </div>
+              <div class="pg-badge-item" id="pg-badge-korea" title="국내 지리 퀴즈 완벽 통과">
+                <div style="font-size:2.8rem;">🇰🇷</div>
+                <div class="pg-badge-name">국토 사랑</div>
+              </div>
+              <div class="pg-badge-item" id="pg-badge-world" title="누적 포인트 1,000점 돌파">
+                <div style="font-size:2.8rem;">👑</div>
+                <div class="pg-badge-name">세계 정복자</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 오른쪽: 플래시 진도 + 약점 -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+          <!-- 플래시카드 진도 -->
+          <div class="glass-panel" style="padding:1.5rem;">
+            <h2 style="margin-bottom:1rem;">⚡ 플래시 학습 진도</h2>
+            <div id="pg-flashcard-progress">
+              <p style="color:var(--text-muted);text-align:center;padding:2rem;">⏳ 불러오는 중...</p>
+            </div>
+          </div>
+
+          <!-- 약점 오답 목록 -->
+          <div class="glass-panel" style="padding:1.5rem;">
+            <h2 style="margin-bottom:0.5rem;">🔴 약점 목록 (오답 남은 항목)</h2>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">플래시 학습에서 아직 마스터하지 못한 항목입니다. 집중적으로 복습해 보세요!</p>
+            <div id="pg-weakness-list">
+              <p style="color:var(--text-muted);text-align:center;padding:2rem;">⏳ 불러오는 중...</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Firebase Configuration Settings Modal (교사용 설정 패널) -->
+  <div class="settings-modal" id="settings-modal">
+    <div class="settings-card glass-panel" style="max-width: 600px;">
+      <h2 class="text-gradient">⚙️ 시스템 설정</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+        시스템 설정 및 Firebase 프로젝트 설정을 관리합니다.
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; max-height: 400px; padding-right: 0.5rem; text-align: left;">
+        
+        <!-- Section 1: Admin Credentials Settings -->
+        <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1rem; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 0.75rem;">🔑 관리자 패널 계정 설정</h3>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>관리자 이메일 (ID)</label>
+            <input type="email" id="fb-admin-email" class="form-control" placeholder="admin@school.kr" value="admin@school.kr">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>관리자 비밀번호</label>
+            <input type="text" id="fb-admin-password" class="form-control" placeholder="admin1234" value="admin1234">
+          </div>
+        </div>
+
+        <!-- Section 2: Firebase Connection Settings -->
+        <div>
+          <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 0.5rem;">🌍 Firebase 프로젝트 연동 (선택)</h3>
+          <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 0.75rem;">
+            실제 Firebase 클라우드 DB에 데이터를 저장하려면 설정을 입력하세요. 입력하지 않으면 로컬 가상DB(데모) 모드로 작동합니다.
+          </p>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>API Key</label>
+            <input type="text" id="fb-apiKey" class="form-control" placeholder="AIzaSy...">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>Auth Domain</label>
+            <input type="text" id="fb-authDomain" class="form-control" placeholder="project-id.firebaseapp.com">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>Project ID</label>
+            <input type="text" id="fb-projectId" class="form-control" placeholder="project-id">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>Storage Bucket</label>
+            <input type="text" id="fb-storageBucket" class="form-control" placeholder="project-id.appspot.com">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label>Messaging Sender ID</label>
+            <input type="text" id="fb-messagingSenderId" class="form-control" placeholder="1234567890">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>App ID</label>
+            <input type="text" id="fb-appId" class="form-control" placeholder="1:123456:web:abcd...">
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button class="btn btn-outline" id="btn-settings-reset" style="flex: 1; border-color: var(--danger); color: var(--danger);">설정 초기화</button>
+        <button class="btn btn-primary" id="btn-settings-save" style="flex: 1;">저장 후 새로고침</button>
+        <button class="btn btn-outline" id="btn-settings-close">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer (인쇄 시 숨겨짐) -->
+  <footer id="app-footer">
+    <p>© 2026 초등 사회과(6학년 세계 지리 단원) 온라인 학습 & 학습지 생성 도구. 모든 권리 보유.</p>
+    <p style="color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; margin-top: 0.3rem;">개발/디자인: Antigravity. License CC BY-SA 3.0</p>
+  </footer>
+
+  <!-- Firebase Compat Core & Auth Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Application Logic Modules -->
+  <script src="js/map-svg.js"></script>
+  <script src="js/korea-map-svg.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/korea-data.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/korea-coords.js"></script>
+  <script src="js/korea-province-maps.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/worksheet.js"></script>
+  <script src="js/flashcard.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

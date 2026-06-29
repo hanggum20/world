@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 공주시 CI: 주황+갈색 아치/성문 형태 (무령왕릉 모티브) -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <path d="M20,72 L20,40 Q20,20 50,20 Q80,20 80,40 L80,72 Z" fill="#e07820" opacity="0.15"/>
+  <!-- 아치 외곽 -->
+  <path d="M22,70 L22,42 Q22,22 50,22 Q78,22 78,42 L78,70" fill="none" stroke="#c85a00" stroke-width="6" stroke-linecap="round"/>
+  <!-- 내부 아치 -->
+  <path d="M34,70 L34,46 Q34,34 50,34 Q66,34 66,46 L66,70" fill="none" stroke="#e07820" stroke-width="5" stroke-linecap="round"/>
+  <!-- 16개 조각 장식 (상단) -->
+  <circle cx="50" cy="24" r="4" fill="#c85a00"/>
+  <circle cx="36" cy="29" r="3" fill="#c85a00"/>
+  <circle cx="64" cy="29" r="3" fill="#c85a00"/>
+  <line x1="22" y1="70" x2="78" y2="70" stroke="#c85a00" stroke-width="5" stroke-linecap="round"/>
+</svg>

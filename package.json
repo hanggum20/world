@@ -1,0 +1,11 @@
+{
+  "name": "world-geography-learning",
+  "version": "1.0.0",
+  "description": "초등 6학년 세계 지리 학습 및 학습지 생성기",
+  "main": "index.html",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

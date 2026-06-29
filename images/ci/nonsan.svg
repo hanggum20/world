@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 논산시 CI: 빨간 물고기/논산사 마크 형태 -->
+  <circle cx="50" cy="50" r="45" fill="white"/>
+  <!-- 물고기 몸통 -->
+  <ellipse cx="48" cy="50" rx="28" ry="18" fill="#cc2200"/>
+  <!-- 물고기 꼬리 -->
+  <path d="M76,50 L90,35 L90,65 Z" fill="#cc2200"/>
+  <!-- 물고기 눈 -->
+  <circle cx="28" cy="46" r="4" fill="white"/>
+  <circle cx="27" cy="45" r="2" fill="#880000"/>
+  <!-- 지느러미 -->
+  <path d="M45,32 Q50,20 60,28" fill="none" stroke="#ee3300" stroke-width="4" stroke-linecap="round"/>
+  <path d="M45,68 Q50,80 60,72" fill="none" stroke="#ee3300" stroke-width="4" stroke-linecap="round"/>
+</svg>
