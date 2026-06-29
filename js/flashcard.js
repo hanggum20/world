@@ -49,12 +49,28 @@
     wrongStudyMode: false,    // 오답 학습 모드 여부
     wrongStudyGroupKey: null, // 현재 오답 학습 그룹 키
     wrongStudyGroupIdx: null, // 오답 학습 그룹 인덱스 (복귀용)
-    wrongStudyStreaks: {},     // 현재 배치의 연속 정답 횟수 { code: streak }
     wrongStudyBatches: [],    // 오답 학습 배치 목록 (전체)
+    level: 'basic',           // 'basic' (기본 - 교과서) 또는 'advanced' (심화 - 전체)
   };
 
   function getCurrentData() {
     return window.AppMode === 'world' ? window.WORLD_DATA : window.KOREA_DATA;
+  }
+
+  function getLevelCountries() {
+    const allData = getCurrentData();
+    if (window.AppMode === 'world' && st.level === 'basic') {
+      const basicCodes = [
+        'kr', 'cn', 'jp', 'in', 'sa', 'ph', 'vn', 'id', 'th', 'mn', 'uz', 'tr', 'ir', 'iq',
+        'gb', 'fr', 'de', 'it', 'es', 'ru', 'gr', 'ch', 'nl', 'be', 'se', 'no', 'fi', 'at', 'pl',
+        'us', 'ca', 'mx', 'cu', 'jm', 'pa',
+        'br', 'ar', 'cl', 'pe', 'co', 've',
+        'eg', 'za', 'ke', 'ma', 'et', 'ng', 'dz', 'tz', 'gh',
+        'au', 'nz', 'fj', 'pg'
+      ];
+      return allData.filter(c => basicCodes.includes(c.code.toLowerCase()));
+    }
+    return allData;
   }
 
   // ── TTS ───────────────────────────────────────────────────────────────────
@@ -278,6 +294,16 @@
     st.wrongStudyMode = false;
     showSubView('fc-continent-select');
 
+    // 난이도 선택기 표시 제어 (세계 지리일 때만 노출)
+    const levelWrapper = document.getElementById('fc-level-tab-wrapper');
+    if (levelWrapper) {
+      if (window.AppMode === 'world') {
+        levelWrapper.style.display = 'flex';
+      } else {
+        levelWrapper.style.display = 'none';
+      }
+    }
+
     let CONTINENT_META = {};
     if (window.AppMode === 'world') {
       CONTINENT_META = {
@@ -305,7 +331,7 @@
     container.innerHTML = '';
 
     Object.keys(CONTINENT_META).forEach(cont => {
-      const countries = getCurrentData().filter(c => c.continent === cont);
+      const countries = getLevelCountries().filter(c => c.continent === cont);
       if (countries.length === 0) return; // 데이터가 없는 지역은 표시하지 않음
       
       const groupCount = Math.ceil(countries.length / 5);
@@ -337,7 +363,7 @@
   // ─────────────────────────────────────────────────────────────────────────
   function startContinent(continent) {
     st.continent = continent;
-    st.allCountries = getCurrentData().filter(c => c.continent === continent);
+    st.allCountries = getLevelCountries().filter(c => c.continent === continent);
     st.groups = makeGroups(st.allCountries);
     renderGroupSelect();
   }
@@ -1133,6 +1159,17 @@
   // ─────────────────────────────────────────────────────────────────────────
   window.AppFlashcard = {
     init() {
+      // 난이도(기본/심화) 탭 선택 이벤트 리스너 바인딩
+      const levelTabs = document.querySelectorAll('.fc-level-tab');
+      levelTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          levelTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          st.level = tab.getAttribute('data-fc-level');
+          renderContinentSelect(); // 대륙 선택 화면 다시 렌더링
+        });
+      });
+
       // 뒤로 가기 버튼들
       document.getElementById('fc-back-to-continents-from-groups')
         ?.addEventListener('click', renderContinentSelect);

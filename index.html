@@ -563,9 +563,16 @@
 
         <!-- ── 대륙 선택 화면 ─────────────────────────────────── -->
         <div id="fc-continent-select">
-          <div class="fc-header">
-            <h1 class="text-gradient">⚡ 플래시 학습 모드</h1>
-            <p style="color:var(--text-muted); margin-top:0.4rem;">학습할 대륙을 선택하세요. 5개국씩 끊어서 지도·국기·수도를 보고 듣고 익힌 후 확인 퀴즈로 마무리합니다.</p>
+          <div class="fc-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+            <div>
+              <h1 class="text-gradient">⚡ 플래시 학습 모드</h1>
+              <p style="color:var(--text-muted); margin-top:0.4rem;">학습할 대륙을 선택하세요. 5개국씩 끊어서 지도·국기·수도를 보고 듣고 익힌 후 확인 퀴즈로 마무리합니다.</p>
+            </div>
+            <!-- 난이도 선택기 (세계지리 모드일 때만 노출) -->
+            <div id="fc-level-tab-wrapper" class="admin-tabs" style="margin:0; background:rgba(255,255,255,0.05); padding:0.25rem; border-radius:8px;">
+              <button class="admin-tab active fc-level-tab" data-fc-level="basic" style="padding:0.4rem 1rem; font-size:0.88rem; border-radius:6px;">💡 기본 (교과서 주요국)</button>
+              <button class="admin-tab fc-level-tab" data-fc-level="advanced" style="padding:0.4rem 1rem; font-size:0.88rem; border-radius:6px;">🔥 심화 (전체 국가)</button>
+            </div>
           </div>
           <div class="fc-continent-grid" id="fc-continent-grid">
             <!-- JS로 주입 -->
