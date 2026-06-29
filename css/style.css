@@ -361,6 +361,17 @@ p { line-height: 1.6; }
   background: rgba(0, 0, 0, 0.02);
 }
 
+/* 셀렉트 박스 드롭다운 옵션 글씨 및 배경색 수정 (다크/라이트 테마 대비) */
+select option {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+[data-theme="light"] select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
