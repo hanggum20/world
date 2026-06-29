@@ -67,6 +67,7 @@
       <a class="nav-item" data-target="study-view">지도 학습</a>
       <a class="nav-item" data-target="quiz-view">온라인 퀴즈</a>
       <a class="nav-item" data-target="worksheet-view">학습지 만들기</a>
+      <a class="nav-item" data-target="classic-view">🎵 클래식 학습</a>
       <a class="nav-item" data-target="progress-view" id="nav-progress">📊 내 진도</a>
       <a class="nav-item hidden" id="nav-admin-panel" data-target="admin-view" style="color: var(--accent); font-weight: bold;">🔧 관리자 패널</a>
     </nav>
@@ -1259,6 +1260,14 @@
             </div>
           </div>
 
+          <!-- 클래식 음악 학습 진도 -->
+          <div class="glass-panel" id="pg-classic-progress-card" style="padding:1.5rem;">
+            <h2 style="margin-bottom:1rem;">🎵 클래식 음악 학습 진도</h2>
+            <div id="pg-classic-progress-wrap">
+              <p style="color:var(--text-muted);text-align:center;padding:1rem;">⏳ 불러오는 중...</p>
+            </div>
+          </div>
+
           <!-- 약점 오답 목록 -->
           <div class="glass-panel" style="padding:1.5rem;">
             <h2 style="margin-bottom:0.5rem;">🔴 약점 목록 (오답 남은 항목)</h2>
@@ -1271,6 +1280,137 @@
         </div>
       </div>
 
+    </section>
+
+    <!-- 8. Classic View (클래식 음악 학습기) -->
+    <section class="view-section" id="classic-view">
+      <div class="fc-wrapper">
+        
+        <!-- ── 스테이지/퀴즈 선택 화면 ─────────────────────────────────── -->
+        <div id="cl-menu-area">
+          <div class="fc-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+            <div>
+              <h1 class="text-gradient">🎵 클래식 음악 학습기</h1>
+              <p style="color:var(--text-muted); margin-top:0.4rem;">교과서 필수 세계 명곡 100선! 음악을 감상하고 재미있는 퀴즈로 포인트를 획득하세요.</p>
+            </div>
+            <div>
+              <button class="btn btn-primary" id="cl-btn-start-quiz" style="padding:0.6rem 1.5rem; font-size:0.95rem; font-weight:700; background:linear-gradient(135deg, var(--secondary), var(--accent)); border:none; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                🏆 클래식 퀴즈 도전 (+10 P)
+              </button>
+            </div>
+          </div>
+          <div class="fc-continent-grid" id="cl-stage-grid">
+            <!-- JS로 스테이지 타일 주입 -->
+          </div>
+        </div>
+
+        <!-- ── 감상 학습 화면 ─────────────────────────────────── -->
+        <div id="cl-study-area" class="hidden">
+          <div class="fc-learn-header">
+            <button class="btn btn-outline fc-back-btn" id="cl-btn-study-back">← 스테이지 목록</button>
+            <div class="fc-learn-meta">
+              <span id="cl-study-stage-title" style="font-size:0.85rem; color:var(--text-muted);">바로크 시대 명곡</span>
+              <span id="cl-study-progress-text" style="font-weight:700; color:var(--primary);">1 / 10</span>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="padding: 2.5rem; text-align: center; margin: 1.5rem auto; max-width: 700px; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+            <!-- 작곡가 가상 이미지/심볼 영역 -->
+            <div id="cl-composer-emoji" style="font-size: 5rem; width: 140px; height: 140px; line-height: 140px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">🎻</div>
+            
+            <div>
+              <h2 id="cl-composer-name" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.3rem;">베토벤</h2>
+              <h3 id="cl-song-title" style="font-size: 1.3rem; color: var(--secondary); font-weight: 700; margin-bottom: 0.5rem;">운명 교향곡 (Symphony No. 5)</h3>
+              <span id="cl-song-era" class="badge" style="font-size: 0.8rem; background: rgba(99,102,241,0.15); color: var(--primary); padding: 0.25rem 0.60rem;">고전주의 음악</span>
+            </div>
+
+            <!-- 플레이어 컨트롤 -->
+            <div style="width: 100%; max-width: 450px; background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin-bottom: 0.8rem;">
+                <button class="btn btn-primary" id="cl-btn-play" style="padding:0.6rem 1.5rem; font-size:0.9rem; font-weight:700;">▶️ 음악 듣기 (30초)</button>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative;">
+                <div id="cl-play-progress" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.25s linear;"></div>
+              </div>
+              <div id="cl-play-time" style="text-align: right; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;">00:00 / 00:30</div>
+            </div>
+
+            <!-- 상식/퀴즈 유도 박스 -->
+            <div class="glass-panel" style="padding: 1.25rem; width: 100%; text-align: left; background: rgba(255,255,255,0.02); border-left: 4px solid var(--secondary);">
+              <h4 style="font-size:0.9rem; font-weight:700; color:var(--secondary); margin-bottom:0.4rem;">💡 재미있는 음악 상식</h4>
+              <p id="cl-song-trivia" style="font-size:0.88rem; line-height:1.5; color:var(--text-muted);">곡에 대한 상식 텍스트가 표시됩니다.</p>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; width:100%; margin-top:1rem; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <button class="btn btn-outline" id="cl-btn-prev-song" style="padding:0.5rem 1rem;">← 이전 곡</button>
+              <button class="btn btn-primary" id="cl-btn-complete-song" style="padding:0.5rem 1.5rem; font-weight:700;">🌟 들었다고 표시하기 (+5 P)</button>
+              <button class="btn btn-outline" id="cl-btn-next-song" style="padding:0.5rem 1rem;">다음 곡 →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 퀴즈 평가 화면 ─────────────────────────────────── -->
+        <div id="cl-quiz-area" class="hidden">
+          <div class="fc-learn-header">
+            <button class="btn btn-outline fc-back-btn" id="cl-btn-quiz-back">← 학습 목록</button>
+            <div class="fc-learn-meta">
+              <span id="cl-quiz-progress-text" style="font-size:0.85rem; color:var(--text-muted);">문제 1 / 10</span>
+              <span id="cl-quiz-score-text" style="font-weight:700; color:var(--secondary);">맞힌 개수: 0개</span>
+            </div>
+          </div>
+
+          <div style="max-width: 600px; margin: 1.5rem auto;">
+            <div class="glass-panel" style="padding: 2rem; text-align: center; margin-bottom: 1.5rem; display:flex; flex-direction:column; align-items:center; gap:1.25rem;">
+              <div style="font-size: 3.5rem; width: 100px; height: 100px; line-height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 1px solid rgba(255,255,255,0.08);">❓</div>
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.3rem;">어떤 곡일까요?</h3>
+                <p style="color:var(--text-muted); font-size:0.88rem;">30초 미리듣기 음악을 재생하고 작곡가와 곡명을 선택하세요.</p>
+              </div>
+            </div>
+
+            <!-- 보기 리스트 (4지선다) -->
+            <div id="cl-quiz-options" style="display:flex; flex-direction:column; gap:0.5rem;">
+              <!-- JS로 4개 버튼 동적 추가 -->
+            </div>
+
+            <!-- 다음 문제 가기 (선택 시 노출) -->
+            <div id="cl-quiz-next-container" style="display:none; text-align:right; margin-top:1.5rem;">
+              <button class="btn btn-primary" id="cl-btn-quiz-next" style="padding: 0.6rem 2rem; font-size: 1rem; font-weight: 700;">다음 문제 →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 결과 화면 ─────────────────────────────────── -->
+        <div id="cl-result-area" class="hidden">
+          <div class="glass-panel" style="padding: 3rem; text-align: center; margin: 3rem auto; max-width: 550px; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+            <div style="font-size: 5rem;">🏆</div>
+            <div>
+              <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">클래식 퀴즈 완료!</h2>
+              <p style="color: var(--text-muted); font-size: 0.95rem;">음악 평가가 정상적으로 종료되었습니다.</p>
+            </div>
+
+            <div style="display: flex; gap: 2rem; margin: 1rem 0;">
+              <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">최종 점수</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="cl-result-score">0 / 10</div>
+              </div>
+              <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+              <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">획득 포인트</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--secondary);" id="cl-result-points">+0 P</div>
+              </div>
+            </div>
+
+            <div id="cl-result-msg" style="font-size: 1rem; color: var(--text-muted); line-height: 1.5;"></div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; width: 100%;">
+              <button class="btn btn-outline" id="cl-btn-result-menu" style="flex:1; padding:0.6rem 0;">메뉴 목록</button>
+              <button class="btn btn-primary" id="cl-btn-result-retry" style="flex:1; padding:0.6rem 0; font-weight:700;">다시 도전</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </section>
 
   </main>
@@ -1365,6 +1505,8 @@
   <script src="js/quiz.js"></script>
   <script src="js/worksheet.js"></script>
   <script src="js/flashcard.js"></script>
+  <script src="js/classic-data.js"></script>
+  <script src="js/classic.js"></script>
   <script src="js/app.js"></script>
 
 </body>

@@ -160,6 +160,11 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       }
     });
 
+    // 클래식 음악 오디오 정지 처리 (다른 뷰로 전환 시 사운드가 꺼지도록 제어)
+    if (targetViewId !== 'classic-view' && window.AppClassic) {
+      window.AppClassic.stopAudio();
+    }
+
     // 특정 뷰 전환 시 추가 액션 수행
     if (targetViewId === 'study-view') {
       window.AppMap.clearSelection();
@@ -168,6 +173,8 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       window.AppWorksheet.generate();
     } else if (targetViewId === 'flashcard-view') {
       window.AppFlashcard.enter();
+    } else if (targetViewId === 'classic-view') {
+      window.AppClassic.enter();
     } else if (targetViewId === 'progress-view') {
       renderProgressView();
     } else if (targetViewId === 'admin-view') {
@@ -297,6 +304,32 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
             </div>`;
           }).join('');
           fcWrap.innerHTML = rows || '<p style="color:var(--text-muted);text-align:center;padding:1rem;">진도 정보가 없습니다.</p>';
+      }
+
+      // (B) 클래식 음악 학습 진도 렌더링
+      const classicWrap = el('pg-classic-progress-wrap');
+      const classicCard = el('pg-classic-progress-card');
+      if (classicWrap) {
+        if (window.AppMode === 'world') {
+          if (classicCard) classicCard.style.display = 'block';
+          const completedClassics = userData.completedClassics || [];
+          const totalSongs = (window.CLASSIC_DATA || []).length || 100;
+          const pct = Math.round((completedClassics.length / totalSongs) * 100);
+          const barColor = pct >= 100 ? 'var(--secondary)' : pct >= 50 ? 'var(--primary)' : 'var(--accent)';
+          classicWrap.innerHTML = `
+            <div class="progress-bar-wrap">
+              <div class="pb-label-row">
+                <span class="pb-name">🎵 전체 클래식 100곡</span>
+                <span class="pb-stat">${completedClassics.length}/${totalSongs} 곡 (${pct}%)</span>
+              </div>
+              <div class="pb-track">
+                <div class="pb-fill" style="width:${pct}%;background:${barColor};"></div>
+              </div>
+            </div>
+          `;
+        } else {
+          // 한국 지리 모드일 때는 클래식 진도 카드 숨김
+          if (classicCard) classicCard.style.display = 'none';
         }
       }
 
@@ -618,10 +651,10 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       
       switchView('dashboard-view');
       
-      // 선택된 모드에 따라 데이터 및 화면 초기화
       window.AppMap.init();
       window.AppFlashcard.init();
       window.AppQuiz.init();
+      if (window.AppClassic) window.AppClassic.init();
     }
 
     // 네비게이션 탭 클릭
