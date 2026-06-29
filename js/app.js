@@ -38,6 +38,16 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       // 사용자 세부 데이터(포인트, 획득 뱃지) 조회 및 동기화
       syncUserProfile();
 
+      // 관리자 패널 네비게이션 링크 분기
+      const navAdminLink = document.getElementById('nav-admin-panel');
+      if (navAdminLink) {
+        if (user.role === 'admin') {
+          navAdminLink.classList.remove('hidden');
+        } else {
+          navAdminLink.classList.add('hidden');
+        }
+      }
+
       // 역할별 라우팅
       if (user.role === 'admin') {
         // 관리자: 관리자 패널로 바로 이동
@@ -51,6 +61,9 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       navLinks.classList.add('hidden');
       userStatusText.classList.add('hidden');
       logoutBtn.classList.add('hidden');
+
+      const navAdminLink = document.getElementById('nav-admin-panel');
+      if (navAdminLink) navAdminLink.classList.add('hidden');
 
       // 로그인 폼 화면으로 이동
       switchView('auth-view');
@@ -406,8 +419,22 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
     // 로고 클릭 시 모드 선택 화면으로 이동 (모드 변경 기능 겸용)
     document.getElementById('go-home-logo').addEventListener('click', () => {
       const user = window.AppAuth.getCurrentUser();
-      if (user) switchView('mode-select-view');
+      if (user) {
+        if (user.role === 'admin') {
+          switchView('admin-view');
+        } else {
+          switchView('mode-select-view');
+        }
+      }
     });
+
+    // 최고관리자 -> 선생님/학생 대시보드 화면 전환 버튼
+    const btnAdminGoTeacher = document.getElementById('btn-admin-go-teacher');
+    if (btnAdminGoTeacher) {
+      btnAdminGoTeacher.addEventListener('click', () => {
+        switchView('dashboard-view');
+      });
+    }
 
     // --- 학습 모드 선택 버튼 ---
     document.getElementById('btn-mode-world').addEventListener('click', () => {

@@ -68,6 +68,7 @@
       <a class="nav-item" data-target="quiz-view">온라인 퀴즈</a>
       <a class="nav-item" data-target="worksheet-view">학습지 만들기</a>
       <a class="nav-item" data-target="progress-view" id="nav-progress">📊 내 진도</a>
+      <a class="nav-item hidden" id="nav-admin-panel" data-target="admin-view" style="color: var(--accent); font-weight: bold;">🔧 관리자 패널</a>
     </nav>
 
     <!-- Theme & Auth Control (로그인 시 노출) -->
@@ -723,6 +724,7 @@
         </div>
         <div style="display:flex;gap:0.75rem;align-items:center;">
           <span id="admin-total-count" class="role-badge admin">전체 0명</span>
+          <button class="btn btn-secondary" id="btn-admin-go-teacher" style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: white;">👩‍🏫 선생님 화면으로 이동</button>
           <button class="btn btn-primary" id="btn-admin-show-create">+ 계정 추가</button>
         </div>
       </div>
