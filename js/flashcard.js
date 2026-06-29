@@ -60,15 +60,22 @@
   function getLevelCountries() {
     const allData = getCurrentData();
     if (window.AppMode === 'world' && st.level === 'basic') {
-      const basicCodes = [
-        'kr', 'cn', 'jp', 'in', 'sa', 'ph', 'vn', 'id', 'th', 'mn', 'uz', 'tr', 'ir', 'iq',
-        'gb', 'fr', 'de', 'it', 'es', 'ru', 'gr', 'ch', 'nl', 'be', 'se', 'no', 'fi', 'at', 'pl',
-        'us', 'ca', 'mx', 'cu', 'jm', 'pa',
-        'br', 'ar', 'cl', 'pe', 'co', 've',
-        'eg', 'za', 'ke', 'ma', 'et', 'ng', 'dz', 'tz', 'gh',
-        'au', 'nz', 'fj', 'pg'
-      ];
-      return allData.filter(c => basicCodes.includes(c.code.toLowerCase()));
+      const limitMap = {
+        '아시아': 30,
+        '유럽': 25,
+        '북아메리카': 20,
+        '남아메리카': 15,
+        '아프리카': 25,
+        '오세아니아': 10
+      };
+      
+      const filtered = [];
+      Object.keys(limitMap).forEach(cont => {
+        const contCountries = allData.filter(c => c.continent === cont);
+        const limit = limitMap[cont];
+        filtered.push(...contCountries.slice(0, limit));
+      });
+      return filtered;
     }
     return allData;
   }
