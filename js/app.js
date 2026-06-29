@@ -699,10 +699,13 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
     });
 
     // 가상 체험(게스트) 진행 버튼
-    document.getElementById('btn-guest').addEventListener('click', () => {
-      window.AppAuth.loginAsGuest()
-        .catch(err => alert(err.message));
-    });
+    const btnGuest = document.getElementById('btn-guest');
+    if (btnGuest) {
+      btnGuest.addEventListener('click', () => {
+        window.AppAuth.loginAsGuest()
+          .catch(err => alert(err.message));
+      });
+    }
 
     // 가입 진행 버튼
     document.getElementById('btn-signup').addEventListener('click', () => {
