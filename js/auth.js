@@ -18,10 +18,10 @@
       try {
         return JSON.parse(saved);
       } catch (e) {
-        return { email: 'admin@school.kr', password: 'admin1234' };
+        return { email: 'hg@g.cnees.kr', password: '123456' };
       }
     }
-    return { email: 'admin@school.kr', password: 'admin1234' };
+    return { email: 'hg@g.cnees.kr', password: '123456' };
   }
 
   // 1. Firebase 설정 로드 및 초기화
@@ -62,10 +62,37 @@
                 email: user.email,
                 displayName: user.displayName || user.email.split('@')[0]
               };
+              
+              // Firestore에서 사용자 정보(역할 등) 조회
+              dbInstance.collection('users').doc(user.uid).get().then(doc => {
+                let role = 'student';
+                if (doc.exists) {
+                  role = doc.data().role || 'student';
+                }
+                
+                // hg@g.cnees.kr의 경우 강제로 admin 역할 부여 및 Firestore 동기화
+                if (user.email === 'hg@g.cnees.kr') {
+                  role = 'admin';
+                  if (!doc.exists || doc.data().role !== 'admin') {
+                    dbInstance.collection('users').doc(user.uid).set({
+                      role: 'admin',
+                      displayName: '최고관리자',
+                      points: 1000
+                    }, { merge: true });
+                  }
+                }
+                
+                currentUser.role = role;
+                if (authStateCallback) authStateCallback(currentUser);
+              }).catch(err => {
+                console.error("Firestore user data load error:", err);
+                currentUser.role = (user.email === 'hg@g.cnees.kr') ? 'admin' : 'student';
+                if (authStateCallback) authStateCallback(currentUser);
+              });
             } else {
               currentUser = null;
+              if (authStateCallback) authStateCallback(currentUser);
             }
-            if (authStateCallback) authStateCallback(currentUser);
           });
           return;
         }
@@ -245,7 +272,7 @@
               uid: user.uid,
               email: user.email,
               displayName: user.displayName || user.email.split('@')[0],
-              role: 'student'
+              role: (user.email === 'hg@g.cnees.kr') ? 'admin' : 'student'
             };
             return currentUser;
           });
@@ -269,7 +296,7 @@
             authStateCallback(currentUser);
             resolve(currentUser);
           } else {
-            reject(new Error("이메일 또는 비밀번호가 틀렸습니다.\n\n[기본 계정 안내]\n관리자: admin@school.kr / admin1234\n선생님: teacher@school.kr / teacher1234\n학생체험: guest@world.net / guest"));
+            reject(new Error("이메일 또는 비밀번호가 틀렸습니다.\n\n[기본 계정 안내]\n관리자: hg@g.cnees.kr / 123456\n선생님: teacher@school.kr / teacher1234\n학생체험: guest@world.net / guest"));
           }
         });
       }
