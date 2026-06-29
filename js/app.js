@@ -677,12 +677,70 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
         document.getElementById('task-detail-overlay').classList.remove('active');
       });
     }
-    const tdpOverlay = document.getElementById('task-detail-overlay');
-    if (tdpOverlay) {
-      tdpOverlay.addEventListener('click', (e) => {
-        if (e.target === tdpOverlay) {
-          tdpOverlay.classList.remove('active');
+    }
+
+    // --- 선생님이 직접 학생 등록하는 이벤트 ---
+    const btnTsCreateSubmit = document.getElementById('btn-ts-create-submit');
+    if (btnTsCreateSubmit) {
+      btnTsCreateSubmit.addEventListener('click', () => {
+        const user = window.AppAuth.getCurrentUser();
+        if (!user) return;
+
+        const school   = user.school || '';
+        const grade    = user.grade;
+        const classNum = user.classNum;
+        
+        const snumEl = document.getElementById('ts-student-num');
+        const nameEl = document.getElementById('ts-student-name');
+        const emailEl = document.getElementById('ts-student-email');
+        const pwEl = document.getElementById('ts-student-password');
+        const msgEl = document.getElementById('ts-create-msg');
+
+        const snum = snumEl.value.trim();
+        const name = nameEl.value.trim();
+        const email = emailEl.value.trim();
+        const pw = pwEl.value.trim();
+
+        if (!name || !email || !pw) {
+          msgEl.innerHTML = '<span style="color:var(--danger);">⚠️ 이름, 이메일, 비밀번호는 필수 입력 항목입니다.</span>';
+          return;
         }
+
+        msgEl.innerHTML = '<span style="color:var(--text-muted);">⏳ 파이어베이스 서버에 계정 생성 중...</span>';
+
+        window.AppAuth.createUser({
+          role: 'student',
+          school: school,
+          grade: grade ? Number(grade) : null,
+          classNum: classNum ? Number(classNum) : null,
+          studentNum: snum ? Number(snum) : null,
+          displayName: name,
+          email: email,
+          password: pw,
+          teacherId: user.uid
+        }).then(() => {
+          msgEl.innerHTML = `<span style="color:var(--secondary);">✅ 학생 등록 성공: ${name} (${email})</span>`;
+          snumEl.value = '';
+          nameEl.value = '';
+          emailEl.value = '';
+          pwEl.value = 'student1234'; // 기본값으로 복구
+          
+          // 학생 목록 및 과제 현황 리로드
+          renderTeacherStudentsView();
+        }).catch(err => {
+          msgEl.innerHTML = `<span style="color:var(--danger);">❌ 등록 실패: ${err.message}</span>`;
+        });
+      });
+    }
+
+    const btnTsCreateReset = document.getElementById('btn-ts-create-reset');
+    if (btnTsCreateReset) {
+      btnTsCreateReset.addEventListener('click', () => {
+        document.getElementById('ts-student-num').value = '';
+        document.getElementById('ts-student-name').value = '';
+        document.getElementById('ts-student-email').value = '';
+        document.getElementById('ts-student-password').value = 'student1234';
+        document.getElementById('ts-create-msg').innerHTML = '';
       });
     }
 
