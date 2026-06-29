@@ -48,6 +48,18 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
         }
       }
 
+      // 내 진도 메뉴 교사/학생별 변경
+      const navProgress = document.getElementById('nav-progress');
+      if (navProgress) {
+        if (user.role === 'teacher' || user.role === 'admin') {
+          navProgress.innerHTML = '📊 학급 학습 현황';
+          navProgress.setAttribute('data-target', 'teacher-students-view');
+        } else {
+          navProgress.innerHTML = '📊 내 진도';
+          navProgress.setAttribute('data-target', 'progress-view');
+        }
+      }
+
       // 역할별 라우팅
       if (user.role === 'admin') {
         // 관리자: 관리자 패널로 바로 이동
@@ -60,10 +72,18 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       // 2) 로그아웃 또는 미인증 상태
       navLinks.classList.add('hidden');
       userStatusText.classList.add('hidden');
+      logoutBtn.classList.remove('hidden'); // hidden 추가/제거는 원본 유지
       logoutBtn.classList.add('hidden');
 
       const navAdminLink = document.getElementById('nav-admin-panel');
       if (navAdminLink) navAdminLink.classList.add('hidden');
+
+      // 로그아웃 시 내 진도 메뉴 기본 텍스트로 초기화
+      const navProgress = document.getElementById('nav-progress');
+      if (navProgress) {
+        navProgress.innerHTML = '📊 내 진도';
+        navProgress.setAttribute('data-target', 'progress-view');
+      }
 
       // 로그인 폼 화면으로 이동
       switchView('auth-view');
@@ -411,7 +431,148 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
           <td style="font-size:0.85rem;">${lastQuiz}</td>
         </tr>`;
       }).join('');
+
+      // 과제별 학습 현황 렌더링
+      renderClassTaskStats(students);
     });
+  }
+
+  // 학습 과제별 통계 렌더링
+  function renderClassTaskStats(students) {
+    window._taskDetailsCache = {};
+
+    const worldFlashGrid = document.getElementById('ts-task-world-grid');
+    const koreaFlashGrid = document.getElementById('ts-task-korea-grid');
+    if (!worldFlashGrid || !koreaFlashGrid) return;
+
+    // --- 1. 세계 지리 과제 목록 ---
+    const worldTasks = [];
+    
+    // (A) 플래시카드 과제
+    const worldContinents = ['아시아', '유럽', '북아메리카', '남아메리카', '아프리카', '오세아니아'];
+    worldContinents.forEach(cont => {
+      const completed = students.filter(s => (s.completedFlashcards || []).includes(cont));
+      const uncompleted = students.filter(s => !(s.completedFlashcards || []).includes(cont));
+      
+      const taskId = 'task_fc_world_' + cont;
+      window._taskDetailsCache[taskId] = {
+        title: `🗂️ [플래시] ${cont}`,
+        completed,
+        uncompleted
+      };
+      
+      worldTasks.push(createTaskCardHtml(taskId, `🗂️ [플래시] ${cont}`, completed.length, uncompleted.length));
+    });
+
+    // (B) 퀴즈 과제
+    const quizTypes = [
+      { key: 'flag', label: '국기 맞추기' },
+      { key: 'capital', label: '수도 맞추기' },
+      { key: 'write-name', label: '이름 쓰기(주관식)' },
+      { key: 'map', label: '지도 위치 맞추기' }
+    ];
+    
+    quizTypes.forEach(q => {
+      const completed = students.filter(s => (s.quizHistory || []).some(h => h.type === q.key && h.mode === 'world'));
+      const uncompleted = students.filter(s => !(s.quizHistory || []).some(h => h.type === q.key && h.mode === 'world'));
+      
+      let avgScore = 0;
+      if (completed.length > 0) {
+        const scores = completed.map(s => {
+          const entry = s.quizHistory.find(h => h.type === q.key && h.mode === 'world');
+          return entry ? (entry.score / entry.maxScore) * 100 : 0;
+        });
+        avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      }
+      
+      const taskId = 'task_qz_world_' + q.key;
+      window._taskDetailsCache[taskId] = {
+        title: `🏆 [퀴즈] ${q.label}`,
+        completed,
+        uncompleted
+      };
+      
+      worldTasks.push(createTaskCardHtml(taskId, `🏆 [퀴즈] ${q.label}`, completed.length, uncompleted.length, completed.length > 0 ? `평균 ${avgScore}점` : ''));
+    });
+
+    worldFlashGrid.innerHTML = worldTasks.join('');
+
+    // --- 2. 한국 지리 과제 목록 ---
+    const koreaTasks = [];
+    
+    // (A) 플래시카드 과제
+    const koreaRegions = ['서울특별시', '경기도', '강원특별자치도', '충청권', '전라권', '경상권', '제주도'];
+    koreaRegions.forEach(reg => {
+      const completed = students.filter(s => (s.completedFlashcards || []).includes(reg));
+      const uncompleted = students.filter(s => !(s.completedFlashcards || []).includes(reg));
+      
+      const taskId = 'task_fc_korea_' + reg;
+      window._taskDetailsCache[taskId] = {
+        title: `🗂️ [플래시] ${reg}`,
+        completed,
+        uncompleted
+      };
+      
+      koreaTasks.push(createTaskCardHtml(taskId, `🗂️ [플래시] ${reg}`, completed.length, uncompleted.length));
+    });
+
+    // (B) 퀴즈 과제
+    const koreaQuizTypes = [
+      { key: 'flag', label: '행정구역 마크' },
+      { key: 'capital', label: '시군구청 소재지' },
+      { key: 'write-name', label: '지역 이름 쓰기' },
+      { key: 'map', label: '행정구역 위치' }
+    ];
+    
+    koreaQuizTypes.forEach(q => {
+      const completed = students.filter(s => (s.quizHistory || []).some(h => h.type === q.key && h.mode === 'korea'));
+      const uncompleted = students.filter(s => !(s.quizHistory || []).some(h => h.type === q.key && h.mode === 'korea'));
+      
+      let avgScore = 0;
+      if (completed.length > 0) {
+        const scores = completed.map(s => {
+          const entry = s.quizHistory.find(h => h.type === q.key && h.mode === 'korea');
+          return entry ? (entry.score / entry.maxScore) * 100 : 0;
+        });
+        avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      }
+      
+      const taskId = 'task_qz_korea_' + q.key;
+      window._taskDetailsCache[taskId] = {
+        title: `🏆 [퀴즈] ${q.label}`,
+        completed,
+        uncompleted
+      };
+      
+      koreaTasks.push(createTaskCardHtml(taskId, `🏆 [퀴즈] ${q.label}`, completed.length, uncompleted.length, completed.length > 0 ? `평균 ${avgScore}점` : ''));
+    });
+
+    koreaFlashGrid.innerHTML = koreaTasks.join('');
+  }
+
+  function createTaskCardHtml(taskId, title, completedCount, totalCount, extraInfo = '') {
+    const total = completedCount + totalCount;
+    const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+    
+    return `
+      <div class="progress-stat-card glass-panel" style="flex-direction: column; align-items: stretch; padding: 1.25rem; gap: 0.75rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(255,255,255,0.05);" onclick="window._openTaskDetail('${taskId}')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(16,185,129,0.3)';" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,0.05)';">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 700; font-size: 0.92rem; color: var(--text);">${title}</span>
+          <span class="role-badge ${pct === 100 ? 'admin' : pct > 0 ? 'teacher' : 'student'}" style="font-size: 0.75rem; padding: 0.15rem 0.4rem;">
+            ${pct}% 완료
+          </span>
+        </div>
+        
+        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+          <span>완료: <strong>${completedCount}</strong> / ${total}명</span>
+          <span style="color: var(--secondary); font-weight: 500;">${extraInfo}</span>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.08); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 0.2rem;">
+          <div style="background: linear-gradient(90deg, var(--secondary), #10b981); width: ${pct}%; height: 100%; border-radius: 4px;"></div>
+        </div>
+      </div>
+    `;
   }
 
   // 6. 전역 공통 이벤트 리스너 바인딩
@@ -488,6 +649,42 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
 
     // 선생님 학생 현황 뷰 - 대시보드로 돌아가기
     document.getElementById('btn-back-dashboard').addEventListener('click', () => switchView('dashboard-view'));
+
+    // 선생님 학생/과제 현황 탭 전환
+    const teacherTabs = document.querySelectorAll('.teacher-tab');
+    teacherTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        teacherTabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.teacher-tab-content').forEach(c => {
+          c.classList.remove('active');
+          c.style.display = 'none';
+        });
+        
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-ts-tab');
+        const content = document.getElementById('ts-tab-' + target + '-content');
+        if (content) {
+          content.classList.add('active');
+          content.style.display = 'block';
+        }
+      });
+    });
+
+    // 과제 상세 팝업 닫기
+    const btnTdpClose = document.getElementById('btn-tdp-close');
+    if (btnTdpClose) {
+      btnTdpClose.addEventListener('click', () => {
+        document.getElementById('task-detail-overlay').classList.remove('active');
+      });
+    }
+    const tdpOverlay = document.getElementById('task-detail-overlay');
+    if (tdpOverlay) {
+      tdpOverlay.addEventListener('click', (e) => {
+        if (e.target === tdpOverlay) {
+          tdpOverlay.classList.remove('active');
+        }
+      });
+    }
 
     // ── 관리자 탭 전환 ──────────────────────────────────────
     document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -647,6 +844,36 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
 
         document.getElementById('student-detail-overlay').classList.add('active');
       });
+    };
+
+    window._openTaskDetail = function(taskId) {
+      const cache = window._taskDetailsCache[taskId];
+      if (!cache) return;
+      
+      document.getElementById('tdp-name').textContent = cache.title;
+      document.getElementById('tdp-info').textContent = `학급 완료 현황 (${cache.completed.length}명 완료 / ${cache.uncompleted.length}명 미완료)`;
+      
+      const compListEl = document.getElementById('tdp-completed-list');
+      const uncompListEl = document.getElementById('tdp-uncompleted-list');
+      const compTitleEl = document.getElementById('tdp-completed-title');
+      const uncompTitleEl = document.getElementById('tdp-uncompleted-title');
+      
+      compTitleEl.textContent = `완료 학생 (${cache.completed.length}명)`;
+      uncompTitleEl.textContent = `미완료 학생 (${cache.uncompleted.length}명)`;
+      
+      if (cache.completed.length === 0) {
+        compListEl.innerHTML = '<li style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:1rem 0;">완료한 학생이 없습니다.</li>';
+      } else {
+        compListEl.innerHTML = cache.completed.map(s => `<li style="background:rgba(16,185,129,0.06); padding:0.4rem 0.75rem; border-radius:6px; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem; border:1px solid rgba(16,185,129,0.15);"><span style="color:#10b981;">✓</span>${s.studentNum ? s.studentNum + '번 ' : ''}<strong>${s.displayName}</strong></li>`).join('');
+      }
+      
+      if (cache.uncompleted.length === 0) {
+        uncompListEl.innerHTML = '<li style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:1rem 0;">미완료 학생이 없습니다.</li>';
+      } else {
+        uncompListEl.innerHTML = cache.uncompleted.map(s => `<li style="background:rgba(239,68,68,0.06); padding:0.4rem 0.75rem; border-radius:6px; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem; border:1px solid rgba(239,68,68,0.15);"><span style="color:#ef4444;">✕</span>${s.studentNum ? s.studentNum + '번 ' : ''}<strong>${s.displayName}</strong></li>`).join('');
+      }
+      
+      document.getElementById('task-detail-overlay').classList.add('active');
     };
 
     // 편집 저장

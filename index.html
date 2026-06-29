@@ -988,26 +988,51 @@
         </div>
       </div>
 
-      <!-- 학생 목록 테이블 -->
-      <div class="glass-panel" style="padding:1.5rem;">
-        <h2 style="margin-bottom:1rem;">🧑‍🎓 학생 목록 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">클릭하면 상세 학습 현황을 확인합니다</span></h2>
-        <div style="overflow-x:auto;">
-          <table class="admin-table" id="teacher-students-table">
-            <thead>
-              <tr>
-                <th>번호</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>포인트</th>
-                <th>퀴즈 횟수</th>
-                <th>배지</th>
-                <th>최근 퀴즈</th>
-              </tr>
-            </thead>
-            <tbody id="teacher-students-tbody">
-              <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ 불러오는 중...</td></tr>
-            </tbody>
-          </table>
+      <!-- 탭 선택기 -->
+      <div class="admin-tabs" style="margin-bottom:1.5rem;">
+        <button class="admin-tab active teacher-tab" data-ts-tab="student">🧑‍🎓 학생별 현황</button>
+        <button class="admin-tab teacher-tab" data-ts-tab="task">📝 과제별 현황</button>
+      </div>
+
+      <!-- 학생별 현황 탭 내용 -->
+      <div class="admin-tab-content active teacher-tab-content" id="ts-tab-student-content" style="display:block;">
+        <div class="glass-panel" style="padding:1.5rem;">
+          <h2 style="margin-bottom:1rem;">🧑‍🎓 학생 목록 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">클릭하면 상세 학습 현황을 확인합니다</span></h2>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="teacher-students-table">
+              <thead>
+                <tr>
+                  <th>번호</th>
+                  <th>이름</th>
+                  <th>이메일</th>
+                  <th>포인트</th>
+                  <th>퀴즈 횟수</th>
+                  <th>배지</th>
+                  <th>최근 퀴즈</th>
+                </tr>
+              </thead>
+              <tbody id="teacher-students-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ 불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 과제별 현황 탭 내용 -->
+      <div class="admin-tab-content teacher-tab-content" id="ts-tab-task-content" style="display:none;">
+        <div class="glass-panel" style="padding:1.5rem; margin-bottom:1.5rem;">
+          <h2 style="margin-bottom:1.25rem;">🌐 세계 지리 학습 과제 현황 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">카드 클릭 시 완료/미완료 학생을 확인합니다</span></h2>
+          <div class="progress-summary-grid" id="ts-task-world-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem;">
+            <p style="color:var(--text-muted); font-size:0.9rem;">⏳ 불러오는 중...</p>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding:1.5rem;">
+          <h2 style="margin-bottom:1.25rem;">🇰🇷 한국 지리 학습 과제 현황 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">카드 클릭 시 완료/미완료 학생을 확인합니다</span></h2>
+          <div class="progress-summary-grid" id="ts-task-korea-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem;">
+            <p style="color:var(--text-muted); font-size:0.9rem;">⏳ 불러오는 중...</p>
+          </div>
         </div>
       </div>
 
@@ -1044,6 +1069,35 @@
             <div style="margin-top:1.5rem;">
               <h3 style="margin-bottom:0.75rem;">📝 최근 퀴즈 기록 (최대 10개)</h3>
               <div id="sdp-quiz-history" style="overflow-x:auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 과제 상세 레이오버 패널 -->
+      <div class="student-detail-overlay" id="task-detail-overlay">
+        <div class="student-detail-panel glass-panel" style="max-width: 500px;">
+          <div class="sdp-header">
+            <div>
+              <h2 id="tdp-name">과제 완료 현황</h2>
+              <p id="tdp-info" style="color:var(--text-muted);font-size:0.88rem;"></p>
+            </div>
+            <button class="btn btn-outline" id="btn-tdp-close" style="padding:0.4rem 0.8rem;">✕ 닫기</button>
+          </div>
+          <div class="sdp-body">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color:var(--secondary); margin-bottom: 0.5rem;" id="tdp-completed-title">완료 학생 (0명)</h4>
+                <ul id="tdp-completed-list" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:0.4rem;">
+                  <!-- 완료 학생 목록 -->
+                </ul>
+              </div>
+              <div>
+                <h4 style="color:var(--danger); margin-bottom: 0.5rem;" id="tdp-uncompleted-title">미완료 학생 (0명)</h4>
+                <ul id="tdp-uncompleted-list" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:0.4rem;">
+                  <!-- 미완료 학생 목록 -->
+                </ul>
+              </div>
             </div>
           </div>
         </div>
