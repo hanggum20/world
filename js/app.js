@@ -304,6 +304,7 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
             </div>`;
           }).join('');
           fcWrap.innerHTML = rows || '<p style="color:var(--text-muted);text-align:center;padding:1rem;">진도 정보가 없습니다.</p>';
+        }
       }
 
       // (B) 클래식 음악 학습 진도 렌더링
@@ -711,7 +712,6 @@ window.AppMode = 'world'; // 'world' 또는 'korea'
       btnTdpClose.addEventListener('click', () => {
         document.getElementById('task-detail-overlay').classList.remove('active');
       });
-    }
     }
 
     // --- 선생님이 직접 학생 등록하는 이벤트 ---
