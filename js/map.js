@@ -5,6 +5,9 @@
   let viewBoxAnimationId = null;
   let currentContinent = 'all';
 
+  // 국기 이미지 로드 실패 시 표시할 깔끔한 회색 대체 이미지 (물음표 표시)
+  const FLAG_FALLBACK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'><rect width='3' height='2' fill='%23e2e8f0'/><text y='1.25' x='1.5' font-family='sans-serif' font-size='0.7' text-anchor='middle' fill='%2394a3b8'>?</text></svg>";
+
   let currentLoadedProvince = null;
   const KOREA_MARKER_MAP = {
     'kr-gw-chuncheon': 'kr-region-108',
@@ -644,7 +647,7 @@
       if (window.AppMode === 'world') {
         flagImg.src = `https://flagcdn.com/w80/${code}.png`;
         flagImg.onerror = function() {
-          this.src = 'https://flagcdn.com/w80/kr.png';
+          this.src = FLAG_FALLBACK;
         };
       } else {
         const sym = data.symbol || '📍';
@@ -1167,7 +1170,7 @@
 
       let imgTag = '';
       if (window.AppMode === 'world') {
-        imgTag = `<img src="https://flagcdn.com/w80/${c.code}.png" alt="${c.name} 국기" onerror="this.src='https://flagcdn.com/w80/kr.png';">`;
+        imgTag = `<img src="https://flagcdn.com/w80/${c.code}.png" alt="${c.name} 국기" onerror="this.src='${FLAG_FALLBACK}';">`;
       } else {
         const sym = c.symbol || '📍';
         if (c.logo) {
