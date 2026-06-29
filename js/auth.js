@@ -338,10 +338,14 @@
               };
               // Firestore 초기 사용자 도큐먼트 생성
               return dbInstance.collection('users').doc(user.uid).set({
+                email: email,
+                displayName: displayName || email.split('@')[0],
                 points: 0,
                 completedQuizzes: [],
+                completedFlashcards: [],
                 badges: ['welcome'],
                 role: 'student',
+                createdAt: new Date().toISOString(),
                 ...(extraData || {})
               }).then(() => currentUser);
             });
@@ -491,26 +495,52 @@
 
     // 전체 사용자 목록 조회 (관리자 전용)
     getAllUsers: function() {
-      return new Promise((resolve) => {
-        const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
-        // 비밀번호 마스킹하여 반환
-        resolve(users.map(u => ({
-          uid: u.uid,
-          email: u.email,
-          password: u.password, // 관리자는 비밀번호 열람 가능
-          displayName: u.displayName,
-          role: u.role || 'student',
-          school: u.school || '',
-          grade: u.grade || null,
-          classNum: u.classNum || null,
-          studentNum: u.studentNum || null,
-          teacherId: u.teacherId || null,
-          points: u.points || 0,
-          badges: u.badges || [],
-          quizHistory: u.quizHistory || [],
-          createdAt: u.createdAt || ''
-        })));
-      });
+      if (!isDemo) {
+        return dbInstance.collection('users').get()
+          .then(querySnapshot => {
+            const users = [];
+            querySnapshot.forEach(doc => {
+              const data = doc.data();
+              users.push({
+                uid: doc.id,
+                email: data.email || '',
+                password: data.password || '********',
+                displayName: data.displayName || '',
+                role: data.role || 'student',
+                school: data.school || '',
+                grade: data.grade || null,
+                classNum: data.classNum || null,
+                studentNum: data.studentNum || null,
+                teacherId: data.teacherId || null,
+                points: data.points || 0,
+                badges: data.badges || [],
+                quizHistory: data.quizHistory || [],
+                createdAt: data.createdAt || ''
+              });
+            });
+            return users;
+          });
+      } else {
+        return new Promise((resolve) => {
+          const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+          resolve(users.map(u => ({
+            uid: u.uid,
+            email: u.email,
+            password: u.password,
+            displayName: u.displayName,
+            role: u.role || 'student',
+            school: u.school || '',
+            grade: u.grade || null,
+            classNum: u.classNum || null,
+            studentNum: u.studentNum || null,
+            teacherId: u.teacherId || null,
+            points: u.points || 0,
+            badges: u.badges || [],
+            quizHistory: u.quizHistory || [],
+            createdAt: u.createdAt || ''
+          })));
+        });
+      }
     },
 
     // 반별 학생 목록 조회 (교사 전용)
@@ -566,35 +596,84 @@
 
     // 계정 생성 (관리자 전용)
     createUser: function(data) {
-      return new Promise((resolve, reject) => {
-        const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
-        if (users.some(u => u.email === data.email)) {
-          reject(new Error("이미 사용 중인 이메일 주소입니다."));
-          return;
-        }
-        const newUser = {
-          uid: 'mock_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-          email: data.email,
-          password: data.password,
-          displayName: data.displayName,
-          role: data.role || 'student',
-          school: data.school || '',
-          grade: data.grade || null,
-          classNum: data.classNum || null,
-          studentNum: data.studentNum || null,
-          teacherId: data.teacherId || null,
-          points: 0,
-          completedQuizzes: [],
-          completedFlashcards: [],
-          badges: ['welcome'],
-          flashcardStats: {},
-          quizHistory: [],
-          createdAt: new Date().toISOString()
-        };
-        users.push(newUser);
-        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-        resolve(newUser);
-      });
+      if (!isDemo) {
+        const config = window.FIREBASE_BUILD_CONFIG || JSON.parse(localStorage.getItem(CONFIG_KEY));
+        
+        // 보조 Firebase 앱 생성하여 현재 관리자 세션(쿠키/인증)을 가로채지 않고 가입 처리
+        const secondaryApp = firebase.initializeApp(config, "SecondaryTempApp");
+        
+        return secondaryApp.auth().createUserWithEmailAndPassword(data.email, data.password)
+          .then(result => {
+            const user = result.user;
+            return user.updateProfile({
+              displayName: data.displayName
+            }).then(() => {
+              const userData = {
+                email: data.email,
+                password: data.password, // 복구용/열람용 비밀번호 저장
+                displayName: data.displayName,
+                role: data.role || 'student',
+                school: data.school || '',
+                grade: data.grade || null,
+                classNum: data.classNum || null,
+                studentNum: data.studentNum || null,
+                teacherId: data.teacherId || null,
+                points: 0,
+                completedQuizzes: [],
+                completedFlashcards: [],
+                badges: ['welcome'],
+                flashcardStats: {},
+                quizHistory: [],
+                createdAt: new Date().toISOString()
+              };
+              
+              return dbInstance.collection('users').doc(user.uid).set(userData)
+                .then(() => {
+                  const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+                  const localUser = Object.assign({ uid: user.uid }, userData);
+                  users.push(localUser);
+                  localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+                  
+                  secondaryApp.delete();
+                  return localUser;
+                });
+            });
+          })
+          .catch(err => {
+            secondaryApp.delete();
+            throw err;
+          });
+      } else {
+        return new Promise((resolve, reject) => {
+          const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+          if (users.some(u => u.email === data.email)) {
+            reject(new Error("이미 사용 중인 이메일 주소입니다."));
+            return;
+          }
+          const newUser = {
+            uid: 'mock_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            email: data.email,
+            password: data.password,
+            displayName: data.displayName,
+            role: data.role || 'student',
+            school: data.school || '',
+            grade: data.grade || null,
+            classNum: data.classNum || null,
+            studentNum: data.studentNum || null,
+            teacherId: data.teacherId || null,
+            points: 0,
+            completedQuizzes: [],
+            completedFlashcards: [],
+            badges: ['welcome'],
+            flashcardStats: {},
+            quizHistory: [],
+            createdAt: new Date().toISOString()
+          };
+          users.push(newUser);
+          localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+          resolve(newUser);
+        });
+      }
     },
 
     // 계정 정보 수정 (관리자 전용)
@@ -611,15 +690,31 @@
 
     // 계정 삭제 (관리자 전용)
     deleteUser: function(uid) {
-      return new Promise((resolve, reject) => {
-        if (uid === 'admin_uid') { reject(new Error("기본 관리자 계정은 삭제할 수 없습니다.")); return; }
-        const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
-        const idx = users.findIndex(u => u.uid === uid);
-        if (idx === -1) { reject(new Error("해당 사용자를 찾을 수 없습니다.")); return; }
-        users.splice(idx, 1);
-        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-        resolve(true);
-      });
+      if (!isDemo) {
+        if (uid === 'admin_uid') return Promise.reject(new Error("기본 관리자 계정은 삭제할 수 없습니다."));
+        
+        // Firestore 도큐먼트 삭제 및 로컬 캐시 삭제
+        return dbInstance.collection('users').doc(uid).delete()
+          .then(() => {
+            const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+            const idx = users.findIndex(u => u.uid === uid);
+            if (idx !== -1) {
+              users.splice(idx, 1);
+              localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+            }
+            return true;
+          });
+      } else {
+        return new Promise((resolve, reject) => {
+          if (uid === 'admin_uid') { reject(new Error("기본 관리자 계정은 삭제할 수 없습니다.")); return; }
+          const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+          const idx = users.findIndex(u => u.uid === uid);
+          if (idx === -1) { reject(new Error("해당 사용자를 찾을 수 없습니다.")); return; }
+          users.splice(idx, 1);
+          localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+          resolve(true);
+        });
+      }
     },
 
     // 파이어베이스 커스텀 설정 보관
