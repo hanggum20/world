@@ -294,11 +294,19 @@
     st.wrongStudyMode = false;
     showSubView('fc-continent-select');
 
-    // 난이도 선택기 표시 제어 (세계 지리일 때만 노출)
+    // 난이도 선택기 표시 제어 및 활성 탭 동기화
     const levelWrapper = document.getElementById('fc-level-tab-wrapper');
     if (levelWrapper) {
       if (window.AppMode === 'world') {
         levelWrapper.style.display = 'flex';
+        const tabs = levelWrapper.querySelectorAll('.fc-level-tab');
+        tabs.forEach(tab => {
+          if (tab.getAttribute('data-fc-level') === st.level) {
+            tab.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+          }
+        });
       } else {
         levelWrapper.style.display = 'none';
       }
@@ -1257,6 +1265,7 @@
     enter() {
       TTS.stop();
       clearAutoPlay();
+      st.level = 'basic'; // 난이도 상태를 기본으로 리셋
       renderContinentSelect();
     }
   };
