@@ -449,6 +449,45 @@
               return dbInstance.collection('users').doc(currentUser.uid).set(initialData)
                 .then(() => initialData);
             }
+          })
+          .catch(err => {
+            console.error("Firestore get document failed, using offline mock fallback:", err);
+            const users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]');
+            const found = users.find(u => u.uid === currentUser.uid);
+            if (found) {
+              return {
+                points: found.points || 0,
+                completedQuizzes: found.completedQuizzes || [],
+                completedFlashcards: found.completedFlashcards || [],
+                badges: found.badges || ['welcome'],
+                flashcardStats: found.flashcardStats || {},
+                quizHistory: found.quizHistory || [],
+                visitedCountries: found.visitedCountries || [],
+                visitedSigungus: found.visitedSigungus || [],
+                worksheetHistory: found.worksheetHistory || [],
+                completedClassicGroups: found.completedClassicGroups || [],
+                role: found.role || 'student',
+                school: found.school || '',
+                grade: found.grade || null,
+                classNum: found.classNum || null,
+                studentNum: found.studentNum || null,
+                teacherId: found.teacherId || null,
+                displayName: found.displayName || ''
+              };
+            }
+            return {
+              points: 0,
+              completedQuizzes: [],
+              completedFlashcards: [],
+              badges: ['welcome'],
+              flashcardStats: {},
+              quizHistory: [],
+              visitedCountries: [],
+              visitedSigungus: [],
+              worksheetHistory: [],
+              completedClassicGroups: [],
+              role: 'student'
+            };
           });
       } else {
         return new Promise((resolve) => {

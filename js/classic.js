@@ -191,9 +191,7 @@
     if (!grid) return;
     grid.innerHTML = '';
 
-    window.AppAuth.getUserData().then(userData => {
-      const completedGroups = userData ? (userData.completedClassicGroups || []) : [];
-
+    const buildCards = (completedGroups) => {
       for (let groupId = 1; groupId <= 60; groupId++) {
         const isDone = completedGroups.includes(groupId);
         const groupSongs = window.CLASSIC_DATA.filter(s => s.group === groupId);
@@ -225,6 +223,14 @@
 
         grid.appendChild(card);
       }
+    };
+
+    window.AppAuth.getUserData().then(userData => {
+      const completedGroups = userData ? (userData.completedClassicGroups || []) : [];
+      buildCards(completedGroups);
+    }).catch(err => {
+      console.warn("Using offline fallback for classic menu:", err);
+      buildCards([]);
     });
   }
 
@@ -380,6 +386,8 @@
           const pointsEl = document.getElementById('user-points');
           if (pointsEl) pointsEl.textContent = `${newPoints} P`;
         });
+      }).catch(err => {
+        console.warn("Failed to update points offline:", err);
       });
     }
 
@@ -431,6 +439,8 @@
           completedClassicGroups: completedGroups
         });
       }
+    }).catch(err => {
+      console.warn("Failed to synchronize completed group offline:", err);
     });
   }
 
